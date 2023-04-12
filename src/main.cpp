@@ -1959,24 +1959,21 @@ void field_calibrate_cb(lv_obj_t * obj, lv_event_t event) {                    /
 
   }
 }
-void screen_calibrate_cb(lv_obj_t * obj, lv_event_t event) {               //callback functions for "Screen Calibrate" (distance calibrtion)
-  switch (event) {
-    case LV_EVENT_PRESSED:
-      Serial.println("screen_calibrate_cb - line 1118");
-      if (obj == btn_exit) {                                          //Exit button
-        screen_calibrate_off();                                     //turn off all objects on screen
-        screen_run_on();                                             //go back to run screen
-      }
-
-      if (obj == btn_field_cal) {
-        Serial.println("line 900");
-        field_calibrate_on();
-      }
-
-
-  }
-
+void screen_calibrate_cb(lv_obj_t *obj, lv_event_t event) {
+    // Callback function for "Screen Calibrate" (distance calibration)
+    if (event == LV_EVENT_PRESSED) {
+        if (obj == btn_exit) {
+            // Exit button
+            Serial.println("screen_calibrate_cb - line 1118");
+            screen_calibrate_off(); // Turn off all objects on screen
+            screen_run_on();        // Go back to run screen
+        } else if (obj == btn_field_cal) {
+            Serial.println("line 900");
+            field_calibrate_on();
+        }
+    }
 }
+
 /*=====================  start of loop   =========================================*/
 void loop() {
 
