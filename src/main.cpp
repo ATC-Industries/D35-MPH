@@ -430,67 +430,83 @@ void newPasswordEventHandler(lv_obj_t * obj, lv_event_t event);
 void screenCalibrateCallback(lv_obj_t * obj, lv_event_t event);
 void fieldCalibrateCallback(lv_obj_t * obj, lv_event_t event);
 
-
-
-
-
-//=========================  SETUP  ============================================
+//========================= SETUP ============================================
 void setup() {
-  task_millis = millis();                               //align task timer to current time
-  old_millis = millis();                                //align loop timer to current time
-  Serial.begin(115200);                                 //serial debug screen
- // Serial2.begin(19200,SERIAL_8N1,25,22);                //uart 2 being used with gps module,25-RX, 22-TX
-  lv_init();                                            //start the littlevgl graphics engine
-  pinMode(12, OUTPUT);                                  //diagnostic output
-  pinMode(25, INPUT);                                   //Speed input pin
-  pinMode(status_light,OUTPUT);                         //on board status led
-  pinMode(alarm_light, OUTPUT);                          //diagnostic output
-  pinMode(aux_light, OUTPUT);                          //diagnostic output
-//  while (Serial2.available() > 0) {
-//    Serial.print(char(Serial2.read()));                //send to serial monitor
-//  }
-  
-  EEPROM.begin(50);                                    //reserve 50 bytes or eeprom storage
-#if USE_LV_LOG != 0
-  lv_log_register_print(my_print);                          /* register print function for debugging */
-#endif
-  tft.init();                                                  //start the lcd display driver
-  tft.setRotation(1);                                         /* Set the  orientation to landscape*/
-  lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);   //set the color depth
-  /**********************
-     Initialize the display
-  **********************/
-  lv_disp_drv_t disp_drv;                                     //create an instance of the display driver
-  lv_disp_drv_init(&disp_drv);                                //initialize the driver
-  //set the size of the display below
-  disp_drv.hor_res = 480;                                     //width max of display
-  disp_drv.ver_res = 320;                                     //height max of display
+  initializeVariables();
+  initializeSerialConnections();
+  initializeLittlevgl();
+  initializePins();
+  initializeEeprom();
+  initializeDisplay();
+  initializeTouchScreen();
+  initializeGraphicsLibraryTick();
+  loadEepromVariables();
+  touchCalibrate();
+  getUserPasscode();
+  createScreenObjects();
+  setupInterruptTimers();
+  enableInputMethod();
+  createScreens();
+  printStartupInfo();
+}
 
-  disp_drv.flush_cb = displayFlush;                          //call back routine to flush screen buffer
+void initializeVariables() {
+  task_millis = millis();
+  old_millis = millis();
+}
+
+void initializeSerialConnections() {
+  Serial.begin(115200);
+  //Serial2.begin(19200, SERIAL_8N1, 25, 22); // UART2 for GPS module: 25-RX, 22-TX
+}
+
+void initializeLittlevgl() {
+  lv_init();
+#if USE_LV_LOG != 0
+  lv_log_register_print(my_print);
+#endif
+}
+
+void initializePins() {
+  pinMode(12, OUTPUT);
+  pinMode(25, INPUT);
+  pinMode(status_light, OUTPUT);
+  pinMode(alarm_light, OUTPUT);
+  pinMode(aux_light, OUTPUT);
+}
+
+void initializeEeprom() {
+  EEPROM.begin(50);
+}
+
+void initializeDisplay() {
+  tft.init();
+  tft.setRotation(1);
+  lv_disp_buf_init(&disp_buf, buf, NULL, LV_HOR_RES_MAX * 10);
+  lv_disp_drv_t disp_drv;
+  lv_disp_drv_init(&disp_drv);
+  disp_drv.hor_res = 480;
+  disp_drv.ver_res = 320;
+  disp_drv.flush_cb = displayFlush;
   disp_drv.buffer = &disp_buf;
-  lv_disp_drv_register(&disp_drv);                            //register the display driver
-  /**********************
-     Touch Screen Setup
-     Initialize the touch pad
-  **********************/
-  lv_indev_drv_t indev_drv;                                     //create an instance of he driver
-  lv_indev_drv_init(&indev_drv);                                //initialize the driver
-  indev_drv.type = LV_INDEV_TYPE_POINTER;                       //type of input
-  indev_drv.read_cb = inputRead;                            //call back routine to call
-                                         //this only runs the first time unless REPEAT_CAL is set to true
-  //*Register the driver in LittlevGL and save the created input device object
-  lv_indev_t * my_indev = lv_indev_drv_register(&indev_drv);    //register the input device
-  lv_indev_init();  
-   
-  //-------------------------------------------------------------------------------
-  /**********************
-     Initialize the graphics library's tick
-  **********************/
+  lv_disp_drv_register(&disp_drv);
+}
+
+void initializeTouchScreen() {
+  lv_indev_drv_t indev_drv;
+  lv_indev_drv_init(&indev_drv);
+  indev_drv.type = LV_INDEV_TYPE_POINTER;
+  indev_drv.read_cb = inputRead;
+  lv_indev_t * my_indev = lv_indev_drv_register(&indev_drv);
+  lv_indev_init();
+}
+
+void initializeGraphicsLibraryTick() {
   tick.attach_ms(LVGL_TICK_PERIOD, tickHandler);
-  old_millis = millis();                                      //save current milli count to varible
-  /**********************
-      load varibles from eeprom
-   **********************/
+  old_millis = millis();
+}
+
+void loadEepromVariables() {
   EEPROM.get(security_ee_adr, security);                        //Enable Security check box
   EEPROM.get(graph_ee_adr, graph);                              //status of enable bar graph check box
   EEPROM.get(dis_ee_adr, dis);                                  //status enable distance check box
@@ -508,36 +524,26 @@ void setup() {
   EEPROM.get(speed_target_2_ee_adr,alarm_speed_2);
   EEPROM.get(speed_target_3_ee_adr,alarm_speed_3);
   EEPROM.get(speed_target_4_ee_adr,alarm_speed_4);
-  EEPROM.get(screen_cal_ee_adr,var_REPEAT_CAL);                  //screen calibration flag
-    if (var_REPEAT_CAL == 55){                                    //if screen is calibrated then 55 is saved toeeprom value
-       REPEAT_CAL = false; 
-      }
-    else{
-      REPEAT_CAL = true;                                          //set to true so touch pan calibration will be performed (touch screen routine)  
-    }
-
-  speed_target = 4.0;   //***diagnostic (force a value) 
-
-
-  
-  // Calibrate the touch screen and set the scaling factors
-  touchCalibrate();    //start the input device
-  EEPROM.get(upw_ee_adr, user_passcode_int);                    //user pass code saved as an integer, converted and used as string in program
-  
-  char data_var[8];                                             //create char array to hold value
-  sprintf(data_var, "%dE", user_passcode_int);                   //convert to a string
-  user_passcode =  String(data_var);                             //set pass code to saved eeprom value
-  if (user_passcode == "-1") {                                    //if not value for passcode then set to "1234"
-    Serial.println(user_passcode);
-    user_passcode = "1234E";                                      //set default password to 1234
-    Serial.println("Default password set to 1234E");
+  EEPROM.get(screen_cal_ee_adr, var_REPEAT_CAL);
+  if (var_REPEAT_CAL == 55) {
+    REPEAT_CAL = false;
+  } else {
+    REPEAT_CAL = true;
   }
-  else {
-    Serial.println(user_passcode);                                //***diagnostic line
-    Serial.println(String("User password set to " + user_passcode));
-  }
+  speed_target = 4.0; //***diagnostic (force a value)
+}
 
-  //create an instance of object
+void getUserPasscode() {
+  EEPROM.get(upw_ee_adr, user_passcode_int);
+  char data_var[8];
+  sprintf(data_var, "%dE", user_passcode_int);
+  user_passcode = String(data_var);
+  if (user_passcode == "-1") {
+    user_passcode = "1234E";
+  }
+}
+
+void createScreenObjects() {
   title_label = lv_label_create(lv_scr_act(), NULL);                   //label for page title
   lv_label_set_text(title_label, "");                                  //screen title
   label_units = lv_label_create(lv_scr_act(), NULL);                   //create a label object for the active screen
@@ -549,50 +555,51 @@ void setup() {
   lv_obj_set_hidden(label_bar_min, true);                              //hide label
   label_bar_max = lv_label_create(lv_scr_act(), NULL);                  //label for max speed on bar graph
   lv_obj_set_hidden(label_bar_max, true);                               //hide label
+}
 
-  
-  //setup interrupt timer used for 250ms timer
-  timer = timerBegin(0,80,true);                                        //create a timer
-  timerAttachInterrupt(timer,&onTimerInterrupt,true);                             //attach callback function to timer
-  timerAlarmWrite(timer,250000,true);                                   //set when to call the callback function (250ms)
-  timerAlarmEnable(timer);                                              //start the timer alarm
-  //setup interrupt for speed pulse counter
+void setupInterruptTimers() {
+  timer = timerBegin(0, 80, true);
+  timerAttachInterrupt(timer, &onTimerInterrupt, true);
+  timerAlarmWrite(timer, 250000, true);
+  timerAlarmEnable(timer);
 
-  //setup interrupt timer used for 100ms timer for alarm flash routine
-//  flash_timer = timerBegin(1,80,true);                                        //create a timer running a 1 mhz
-//  timerAttachInterrupt(flash_timer,&alarm_Flash_Timer,true);                   //attach callback function to timer
-//  timerAlarmWrite(flash_timer,100000,true);                                   //set elapsed time when to call the callback function (100ms)
-//  timerAlarmEnable(flash_timer);                                             //start the timer               
-  
-  if (speed_input == 0){
-    enableRadar();                                                     //turn off serial2 and turn on pulse interrupt
-    }
-  else{
-    enableGPS();                                                     //turn on serial2 and turn off pulse interrupt                                              
-    }
- 
-  createTitleLine();                                                 //create screen seperator lines
-  buildScreenRun();                                                  //build the different screens
-  buildOptionScreen();                                               //set program options
-  buildScreenTarget();                                               //set target speed for center of bar graph
-  buildScreenCalibrate();                                            //cal number setup with keypad
-  buildFieldCalibrate();                                             //cal number setup by driving distance
-  buildFactoryScreen();                                              //factory settings (new user password, touch screen cal.)
-  buildSetTarget();                                                  //build screen to set target speeds
+  // flash_timer = timerBegin(1, 80, true);
+  // timerAttachInterrupt(flash_timer, &alarm_Flash_Timer, true);
+  // timerAlarmWrite(flash_timer, 100000, true);
+  // timerAlarmEnable(flash_timer);
+}
+
+void enableInputMethod() {
+  if (speed_input == 0) {
+    enableRadar();
+  } else {
+    enableGPS();
+  }
+}
+
+void createScreens() {
+  createTitleLine();
+  buildScreenRun();
+  buildOptionScreen();
+  buildScreenTarget();
+  buildScreenCalibrate();
+  buildFieldCalibrate();
+  buildFactoryScreen();
+  buildSetTarget();
   optionScreenOff();
+  screenRunOn();
+}
 
-  screenRunOn();                                                      //turn on the run screen
-
+void printStartupInfo() {
   Serial.println(" ");
-  Serial.print("File Name - ");                                        //print file name and path to serial monitor
+  Serial.print("File Name - ");
   Serial.println(__FILE__);
-  Serial.print("Software installed  - ");
+  Serial.print("Software installed - ");
   Serial.println(__DATE__);
-//  Serial.print("ESP Mac Address - ");                                   //send mac address to serial monitor
-//  Serial.println(WiFi,macAddress());
+  // Serial.print("ESP Mac Address - ");
+  // Serial.println(WiFi.macAddress());
+}
 
-  
-}//end 0f setup()
 //======================= Screen ON/OFF Routines  =================================
 void field_calibrate_on(void) {
   field_calibration_flag = true;                                  //set flag so timer interupt will not reset pulse count
