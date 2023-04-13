@@ -288,74 +288,76 @@ static const char * btnm_map[] = {"1", "2", "3", "4", "5", "Enter", "\n", //text
  ********************/
 
 //***   speed input interrupt ******** 
-void IRAM_ATTR speed_pulse () {                                    //interupt driven pulse counter when using pulse counter mode
-   if (pulse == 0){
-      timerWrite(timer,0);                                          //restart timer from 0 on first pulse to realign clock with first pulse
-      }
-   pulse = pulse + 1;                                               //increment the pulse counter if 250 ms have not elapsed
- 
-   }
-//**** TImer interupt  ********
-void IRAM_ATTR onTimer(){                                              //interrupt routine for 250 ms timer used to update mph screen
-    if (field_calibration_flag == false){                           //if not in field calibration mode
-       old_pulse = pulse;                                               //save pulse count
-        pulse = 0;                                                      //reset pulse counter
-        calc_flag = true;                                               //set flag since 250ms have elapsed
-        }
+void IRAM_ATTR onSpeedPulse() {
+  if (pulse == 0) {
+    resetTimer();
   }
-void alarm_Flash_Timer(){
-     if (alarm_enable == 1&& (velocity > 1)) {                           //if alarm bit is set turn on alarm light if in range
-                                                                         //start flashing light 1 mph below target alarm
-                                                                         
-            
-            if (velocity >= speed_target){
-              digitalWrite(alarm_light,true);                    //solid alarm light if over target speed
-               }
-            else if (velocity >= speed_target  - .1){
-              if(millis()- alarm_millis >= 50){
-                   digitalWrite(alarm_light,!digitalRead(alarm_light));     //toggle light
-                   alarm_millis = millis();                             //reload counter
-                   }
-              }
-            else if (velocity >= speed_target  - .2){
-              if(millis()- alarm_millis >= 100){
-                   digitalWrite(alarm_light,!digitalRead(alarm_light));     //toggle light
-                   alarm_millis = millis();                             //reload counter
-                   }
-               }
-            else if (velocity >= speed_target  - .4){
-              if(millis()- alarm_millis >= 175){
-                   digitalWrite(alarm_light,!digitalRead(alarm_light));     //toggle light
-                   alarm_millis = millis();                             //reload counter
-                   }
-            }
-            else if (velocity >= speed_target  - .6){
-              if(millis()- alarm_millis >= 325){
-                   digitalWrite(alarm_light,!digitalRead(alarm_light));     //toggle light
-                   alarm_millis = millis();                             //reload counter
-                   }
-            }
-            else if (velocity >= speed_target  - .8){
-              if(millis()- alarm_millis >= 750){
-                   digitalWrite(alarm_light,!digitalRead(alarm_light));     //toggle light
-                   alarm_millis = millis();                             //reload counter
-                   }
-            }
-            else if (velocity >= speed_target  - 1){
-              if(millis()- alarm_millis >= 1000){
-                   digitalWrite(alarm_light,!digitalRead(alarm_light));     //toggle light
-                   alarm_millis = millis();                             //reload counter
-                   }
-            }
-            else{                                                //if not in alarm range,turn off alarm light 
-              digitalWrite(alarm_light,false);
-            }
-           
-     }
-//     else {
-//      digitalWrite(alarm_light,false);                           //turn off alarm light if not in alarm mode  (alarm_enable ==0)      
-//     }
+  incrementPulseCounter();
+}
+
+void resetTimer() {
+  timerWrite(timer, 0);
+}
+
+void incrementPulseCounter() {
+  pulse++;
+}
+
+
+//**** Timer interupt  ********
+void IRAM_ATTR onTimerInterrupt() {
+  if (!field_calibration_flag) {
+    updatePulseCount();
   }
+}
+
+void updatePulseCount() {
+  old_pulse = pulse;
+  pulse = 0;
+  calc_flag = true;
+}
+
+
+void alarmFlashTimer() {
+  if (alarm_enable && (velocity > 1)) {
+    if (velocity >= speed_target) {
+      setAlarmLight(true);
+    } else {
+      uint16_t flashInterval = calculateFlashInterval(velocity);
+      toggleAlarmLight(flashInterval);
+    }
+  } else {
+    setAlarmLight(false);
+  }
+}
+
+uint16_t calculateFlashInterval(float currentVelocity) {
+  if (currentVelocity >= speed_target - 0.1) {
+    return 50;
+  } else if (currentVelocity >= speed_target - 0.2) {
+    return 100;
+  } else if (currentVelocity >= speed_target - 0.4) {
+    return 175;
+  } else if (currentVelocity >= speed_target - 0.6) {
+    return 325;
+  } else if (currentVelocity >= speed_target - 0.8) {
+    return 750;
+  } else {
+    return 1000;
+  }
+}
+
+void toggleAlarmLight(uint16_t interval) {
+  if (millis() - alarm_millis >= interval) {
+    digitalWrite(alarm_light, !digitalRead(alarm_light));
+    alarm_millis = millis();
+  }
+}
+
+void setAlarmLight(bool state) {
+  digitalWrite(alarm_light, state);
+}
+
 void create_title_line(void) {
 
   static lv_point_t line_points[] = { {2, 22}, {480, 22}};              /*Create an array for the points of the line*/
@@ -547,7 +549,7 @@ void setup() {
   
   //setup interrupt timer used for 250ms timer
   timer = timerBegin(0,80,true);                                        //create a timer
-  timerAttachInterrupt(timer,&onTimer,true);                             //attach callback function to timer
+  timerAttachInterrupt(timer,&onTimerInterrupt,true);                             //attach callback function to timer
   timerAlarmWrite(timer,250000,true);                                   //set when to call the callback function (250ms)
   timerAlarmEnable(timer);                                              //start the timer alarm
   //setup interrupt for speed pulse counter
@@ -1979,7 +1981,7 @@ void loop() {
 
   
   if (alarm_enable == 1 && run_screen_flag ==1){                   //is alarm feature set?
-    alarm_Flash_Timer();                                           //call routine to flash warning light at varible rates
+    alarmFlashTimer();                                           //call routine to flash warning light at varible rates
     }
   else{
     digitalWrite(alarm_light,false);                               //turn off light if not in alarm mode
@@ -2353,7 +2355,7 @@ void enable_gps(void){
 }
 void enable_radar(void){
      Serial.println("enable wheel pulse interput");
-     attachInterrupt(digitalPinToInterrupt(25), speed_pulse, RISING);                //turn on pulse interrupt
+     attachInterrupt(digitalPinToInterrupt(25), onSpeedPulse, RISING);                //turn on pulse interrupt
 }
 void btn_reset_dist_cb(lv_obj_t * btn, lv_event_t event) {                          //distance reset button callback for button in upper right corner of  run screen
   Serial.println("line 1180 btn_reset_dist_cb");                                    //***disagnostic
