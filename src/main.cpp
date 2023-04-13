@@ -15,6 +15,7 @@
 //#include <NMEAGPS.h>                //include for GPS sensor
 #include "TouchScreen.h"
 //#include "WiFi.h"
+#include "Read_User_Setup.h"
 /**********************
     Define IO pins
  **********************/
@@ -589,7 +590,7 @@ void setup() {
   Serial.println(__DATE__);
 //  Serial.print("ESP Mac Address - ");                                   //send mac address to serial monitor
 //  Serial.println(WiFi,macAddress());
-
+  printPins(tft);
   
 }//end 0f setup()
 //======================= Screen ON/OFF Routines  =================================
@@ -1982,7 +1983,6 @@ void screen_calibrate_cb(lv_obj_t *obj, lv_event_t event) {
 /*=====================  start of loop   =========================================*/
 void loop() {
 
-  
   if (alarm_enable == 1 && run_screen_flag ==1){                   //is alarm feature set?
     alarm_Flash_Timer();                                           //call routine to flash warning light at varible rates
     }
