@@ -1,0 +1,28 @@
+[code]
+TFT_eSPI ver = 2.5.23
+Processor    = ESP32
+Frequency    = 240MHz
+Transactions = Yes
+Interface    = SPI
+Display driver = 9488
+Display width  = 320
+Display height = 480
+
+MOSI    = GPIO 23
+SCK     = GPIO 18
+TFT_CS   = GPIO 15
+TFT_DC   = GPIO 0
+TFT_RST  = GPIO 2
+TOUCH_CS = GPIO 4
+
+Font GLCD   loaded
+Font 2      loaded
+Font 4      loaded
+Font 6      loaded
+Font 7      loaded
+Font 8      loaded
+Smooth font enabled
+
+Display SPI frequency = 27.00
+Touch SPI frequency   = 2.50
+[/code]

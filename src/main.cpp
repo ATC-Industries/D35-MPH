@@ -81,7 +81,7 @@ TFT_eSPI tft = TFT_eSPI();                          /* TFT instance */
 
 static lv_disp_buf_t disp_buf;                      //declare buffer for graphics
 static lv_color_t buf[LV_HOR_RES_MAX * 10];         //color depth of display
-static  int x = 90;
+// static  int x = 90;
 
 /**************************                         // This is the file name used to store the calibration data
    Touch Screen Calibration                         // You can change this to create new calibration files.
@@ -105,9 +105,9 @@ void my_print(lv_log_level_t level, const char * file, uint32_t line, const char
 /**********************
     STATIC PROTOTYPES
  **********************/
-static void btn_event_cb(lv_obj_t * btn, lv_event_t event);
-static void ddlist_event_cb(lv_obj_t * ddlist, lv_event_t event);
-static lv_obj_t * slider;          //create a slider object
+// static void btn_event_cb(lv_obj_t * btn, lv_event_t event);
+// static void ddlist_event_cb(lv_obj_t * ddlist, lv_event_t event);
+// static lv_obj_t * slider;          //create a slider object
 /**********************
     varibles
  **********************/
@@ -410,7 +410,7 @@ void target_speed_event_handler(lv_obj_t * obj, lv_event_t event);
 static void btn_set_cal_cb(lv_obj_t * obj, lv_event_t event);
 static void cal_set_cb(lv_obj_t * btn, lv_event_t event);
 static void btn_target_exit_cb(lv_obj_t * btn, lv_event_t event);
-static void cal_btn_exit_cb(lv_obj_t * obj, lv_event_t event);
+// static void cal_btn_exit_cb(lv_obj_t * obj, lv_event_t event);
 static void my_start_btn_cb(lv_obj_t * obj, lv_event_t event);
 static void unit_event_cb(lv_obj_t * obj, lv_event_t event);
 void touch_calibrate();
@@ -478,7 +478,7 @@ void setup() {
   indev_drv.read_cb = my_input_read;                            //call back routine to call
                                          //this only runs the first time unless REPEAT_CAL is set to true
   //*Register the driver in LittlevGL and save the created input device object
-  lv_indev_t * my_indev = lv_indev_drv_register(&indev_drv);    //register the input device
+  // lv_indev_t * my_indev = lv_indev_drv_register(&indev_drv);    //register the input device
   lv_indev_init();  
    
   //-------------------------------------------------------------------------------
@@ -950,7 +950,7 @@ void screen_factory_on(void) {
   run_screen_flag = 0;                               //clear flag to disable mph display routine in loop
   lv_obj_set_pos(pw_text, 180, 90);
   char buff1[6];
-  sprintf(buff1, "Current code = %d", user_passcode.toInt());
+  sprintf(buff1, "Current code = %ld", user_passcode.toInt());
   lv_label_set_text(pw_text, buff1 );                /*Show the existing password*/
 }
 void screen_factory_off(void) {                                         //turn off all objects on factory settings screen
@@ -1046,7 +1046,7 @@ void build_factory_screen() {
   pw_text = lv_label_create(lv_scr_act(), NULL);                        /*Add a label to the button*/
   lv_obj_set_pos(pw_text, 180, 90);
   char buff1[6];
-  sprintf(buff1, "Current code = %d", user_passcode.toInt());
+  sprintf(buff1, "Current code = %ld", user_passcode.toInt());
   lv_label_set_text(pw_text, buff1 );                /*Show the existing password*/
 
   touch_cal_but_text = lv_label_create(lv_scr_act(), NULL);              /*Add a label to identify current password next to reset pw button*/
@@ -1125,7 +1125,7 @@ void new_pw_event_handler(lv_obj_t * obj, lv_event_t event) {             //even
           int xvar = user_passcode.toInt();
           EEPROM.put(upw_ee_adr, xvar);                                 //save new user password to eeprom as integer value
           EEPROM.commit();
-          printf("%d is the new password **********\n", user_passcode.toInt());     //***diagnostic code
+          printf("%ld is the new password **********\n", user_passcode.toInt());     //***diagnostic code
           screen_run_off();                                            //turn off objects used from run screen
           lv_obj_set_hidden(keypad_pw, true);                          //hide the keypad
           screen_factory_on();                                         //show the factory screen
@@ -1522,8 +1522,8 @@ void build_screen_run(void) {
   lv_obj_set_drag(label_arrow, false);                                //allow text to be dragged
   lv_label_set_text(label_arrow, LV_SYMBOL_EJECT);
   lv_obj_set_hidden(label_arrow, false);
-  int hor = 50;
-  int hor_space = 30;
+  // int hor = 50;
+  // int hor_space = 30;
 
   static lv_point_t line_points[] = { {56, 310}, {56, 290},                       //--------   Ruler grid under bar graph
     {71, 290}, {71, 295},   {71, 295}, {71, 290}, //--
@@ -2412,8 +2412,8 @@ static void lv_security_code(void) {                                            
   Serial.println("line 512");
 }
 static void security_event_handler(lv_obj_t * obj, lv_event_t event) {            //callback for keypad on password screen
-  char hold[10];                                                                  //temp array to hold the x value
-  char str_temp[] = "";
+  // char hold[10];                                                                  //temp array to hold the x value
+  // char str_temp[] = "";
   if (event == LV_EVENT_VALUE_CHANGED) {
     if (obj != NULL) {
       const char *txt = lv_btnm_get_active_btn_text(obj);                           //get the text value of pressed button
@@ -2504,7 +2504,7 @@ static void mbox1_handler_cb(lv_obj_t * obj, lv_event_t event) {                
     printf("Button: %s\n", lv_mbox_get_active_btn_text(obj));     //this will display the text of the button that was pressed
     const char * txt = lv_mbox_get_active_btn_text(obj);
 
-    if (txt == "Close") {
+    if (strcmp(txt, "Close") == 0) {
       Serial.println("line 1256");
       lv_obj_del(obj);                                         //delete this message box
       lv_obj_set_hidden(option_descrip_text, true);            //hide option description text
@@ -2513,7 +2513,7 @@ static void mbox1_handler_cb(lv_obj_t * obj, lv_event_t event) {                
       screen_run_on();
     }
 
-    if (txt == "Calibrate") {
+    if (strcmp(txt, "Calibrate") == 0) {
       Serial.println("line 1262");
       lv_obj_del(obj);                                         //delete this message box
       lv_obj_set_hidden(option_descrip_text, true);            //hide option description text
@@ -2522,7 +2522,7 @@ static void mbox1_handler_cb(lv_obj_t * obj, lv_event_t event) {                
       screen_calibrate_on();                                           //goto calibration screen
     }
 
-    if (txt == "Options") {
+    if (strcmp(txt, "Options") == 0) {
       Serial.println("line 1268");
       lv_obj_del(obj);                                         //delete this message box
       lv_obj_set_hidden(option_descrip_text, true);            //hide option description text
@@ -2865,37 +2865,37 @@ static void btn_target_exit_cb(lv_obj_t * btn, lv_event_t event) {
     Serial.println("line 1662 btn_target_exit_cb");
   }
 }
-static void cal_btn_exit_cb(lv_obj_t * obj, lv_event_t event) {                   //exit the calibration screen
+// static void cal_btn_exit_cb(lv_obj_t * obj, lv_event_t event) {                   //exit the calibration screen
 
-  switch (event) {
-    case LV_EVENT_PRESSED:                                                    //if exit button is pressed
-      screen_run_on();                                                      //go back to run screen
-      break;
-    case LV_EVENT_SHORT_CLICKED:
-      //Serial.println("Short clicked\n");
-      break;
+//   switch (event) {
+//     case LV_EVENT_PRESSED:                                                    //if exit button is pressed
+//       screen_run_on();                                                      //go back to run screen
+//       break;
+//     case LV_EVENT_SHORT_CLICKED:
+//       //Serial.println("Short clicked\n");
+//       break;
 
-    case LV_EVENT_CLICKED:
-      // Serial.println("Clicked\n");
-      break;
+//     case LV_EVENT_CLICKED:
+//       // Serial.println("Clicked\n");
+//       break;
 
-    case LV_EVENT_LONG_PRESSED:
-      //  Serial.println("Long press\n");
-      break;
+//     case LV_EVENT_LONG_PRESSED:
+//       //  Serial.println("Long press\n");
+//       break;
 
-    case LV_EVENT_LONG_PRESSED_REPEAT:
-      //   Serial.println("Long press repeat\n");
-      break;
+//     case LV_EVENT_LONG_PRESSED_REPEAT:
+//       //   Serial.println("Long press repeat\n");
+//       break;
 
-    case LV_EVENT_RELEASED:
-      //  Serial.println("Released\n");
-      break;
+//     case LV_EVENT_RELEASED:
+//       //  Serial.println("Released\n");
+//       break;
 
-  }
+//   }
 
 
-  /*Etc.*/
-}
+//  /*Etc.*/
+// }
 static void my_start_btn_cb(lv_obj_t * obj, lv_event_t event) {                   //call back for setup button in upper left corner of screen
 
   switch (event) {
