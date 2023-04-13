@@ -1,7 +1,13 @@
 # D35 MPH Monitor
 
 VERY IMPORTANT
-You MUST replace the User_Setup.h file in the TFT_eSPI library with the one in the D35 MPH Monitor folder.  This is the only way to get the display to work. You should copy the file from the D35 folder don't move it. If your library ever updates it will Override this file. As of right now this is the only solution that works.
+You MUST replace the `User_Setup.h` file in the TFT_eSPI (`.pio/libdeps/esp-wrover-kit/TFT_eSPI`) library with the one in the D35 MPH Monitor folder.  This is the only way to get the display to work. You should copy the file from the D35 folder don't move it. If your library ever updates it will Override this file. As of right now this is the only solution that works.
+1. Locate the `TFT_eSPI` library folder in your project (`.pio/libdeps/esp-wrover-kit/TFT_eSPI`).
+2. Locate the `User_Setup.h` file in the D35 MPH Monitor folder.
+3. Copy the `User_Setup.h` file from the D35 MPH Monitor folder.
+4. Replace the `User_Setup.h` file in the `TFT_eSPI` library folder with the copied one.
+
+Please note that if the `TFT_eSPI` library updates in the future, it may overwrite the custom `User_Setup.h` file. In that case, you will need to replace it again with the provided file from the D35 MPH Monitor folder.
 
 ## Note on conversions and calculating speed
 | Conversion Formula | Formula |
