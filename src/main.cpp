@@ -386,49 +386,49 @@ lv_obj_t* createLineWithStyle(const lv_point_t *points, uint16_t point_count, lv
 }
 
 
-//FUNCTION STUBS
-void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
-void build_screen_calibrate(void);
-void build_option_screen();
-void build_screen_target(void);
-void build_set_target(void);
-bool my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data);
-static void lv_tick_handler(void);
-void calculate_speed_constant(void);
-void mult_alarm_cb(lv_obj_t * btn, lv_event_t event);
-void ma_keyboard_cb(lv_obj_t * obj, lv_event_t event);
-void test_flash_alarm(void);
-void enable_gps(void);
-void enable_radar(void);
-void btn_reset_dist_cb(lv_obj_t * btn, lv_event_t event);
-void speed_bar(void);
-void lv_ex_mbox_1(void);
-static void lv_security_code(void);
-static void security_event_handler(lv_obj_t * obj, lv_event_t event);
-static void mbox1_handler_cb(lv_obj_t * obj, lv_event_t event);
-void lv_ex_btnm_1(void);
-void target_speed_event_handler(lv_obj_t * obj, lv_event_t event);
-static void btn_set_cal_cb(lv_obj_t * obj, lv_event_t event);
-static void cal_set_cb(lv_obj_t * btn, lv_event_t event);
-static void btn_target_exit_cb(lv_obj_t * btn, lv_event_t event);
-static void cal_btn_exit_cb(lv_obj_t * obj, lv_event_t event);
-static void my_start_btn_cb(lv_obj_t * obj, lv_event_t event);
-static void unit_event_cb(lv_obj_t * obj, lv_event_t event);
-void touch_calibrate();
-void build_screen_calibrate(void);
-void build_screen_run(void);
-void build_field_calibrate(void);
-void screen_calibrate_off(void);
-void screen_run_off(void);                                               
-void screen_target_off(void);
-void build_factory_screen(void);                                              //factory settings (new user password, touch screen cal.)
-void option_screen_off(void);
-void screen_run_on(void); 
-void screen_set_multi_target_on(void);
-void fact_opt_cb(lv_obj_t * obj, lv_event_t event);
-void new_pw_event_handler(lv_obj_t * obj, lv_event_t event);
-void screen_calibrate_cb(lv_obj_t * obj, lv_event_t event);
-void field_calibrate_cb(lv_obj_t * obj, lv_event_t event);
+// Function prototypes
+void displayFlush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
+void buildScreenCalibrate();
+void buildOptionScreen();
+void buildScreenTarget();
+void buildSetTarget();
+bool inputRead(lv_indev_drv_t * drv, lv_indev_data_t*data);
+void tickHandler();
+void calculateSpeedConstant();
+void multAlarmCallback(lv_obj_t * btn, lv_event_t event);
+void maKeyboardCallback(lv_obj_t * obj, lv_event_t event);
+void testFlashAlarm();
+void enableGPS();
+void enableRadar();
+void btnResetDistanceCallback(lv_obj_t * btn, lv_event_t event);
+void speedBar();
+void createMessageBox();
+void displaySecurityCode();
+void securityEventHandler(lv_obj_t * obj, lv_event_t event);
+void messageBoxHandlerCallback(lv_obj_t * obj, lv_event_t event);
+void createButtonMatrix();
+void targetSpeedEventHandler(lv_obj_t * obj, lv_event_t event);
+void btnSetCalibrationCallback(lv_obj_t * obj, lv_event_t event);
+void calSetCallback(lv_obj_t * btn, lv_event_t event);
+void btnTargetExitCallback(lv_obj_t * btn, lv_event_t event);
+void calBtnExitCallback(lv_obj_t * obj, lv_event_t event);
+void startButtonCallback(lv_obj_t * obj, lv_event_t event);
+void unitEventCallback(lv_obj_t * obj, lv_event_t event);
+void touchCalibrate();
+void buildScreenCalibrate();
+void buildScreenRun();
+void buildFieldCalibrate();
+void screenCalibrateOff();
+void screenRunOff();                                               
+void screenTargetOff();
+void buildFactoryScreen();                                              //factory settings (new user password, touch screen cal.)
+void optionScreenOff();
+void screenRunOn(); 
+void screenSetMultiTargetOn();
+void factoryOptionCallback(lv_obj_t * obj, lv_event_t event);
+void newPasswordEventHandler(lv_obj_t * obj, lv_event_t event);
+void screenCalibrateCallback(lv_obj_t * obj, lv_event_t event);
+void fieldCalibrateCallback(lv_obj_t * obj, lv_event_t event);
 
 
 
@@ -466,7 +466,7 @@ void setup() {
   disp_drv.hor_res = 480;                                     //width max of display
   disp_drv.ver_res = 320;                                     //height max of display
 
-  disp_drv.flush_cb = my_disp_flush;                          //call back routine to flush screen buffer
+  disp_drv.flush_cb = displayFlush;                          //call back routine to flush screen buffer
   disp_drv.buffer = &disp_buf;
   lv_disp_drv_register(&disp_drv);                            //register the display driver
   /**********************
@@ -476,7 +476,7 @@ void setup() {
   lv_indev_drv_t indev_drv;                                     //create an instance of he driver
   lv_indev_drv_init(&indev_drv);                                //initialize the driver
   indev_drv.type = LV_INDEV_TYPE_POINTER;                       //type of input
-  indev_drv.read_cb = my_input_read;                            //call back routine to call
+  indev_drv.read_cb = inputRead;                            //call back routine to call
                                          //this only runs the first time unless REPEAT_CAL is set to true
   //*Register the driver in LittlevGL and save the created input device object
   lv_indev_t * my_indev = lv_indev_drv_register(&indev_drv);    //register the input device
@@ -486,7 +486,7 @@ void setup() {
   /**********************
      Initialize the graphics library's tick
   **********************/
-  tick.attach_ms(LVGL_TICK_PERIOD, lv_tick_handler);
+  tick.attach_ms(LVGL_TICK_PERIOD, tickHandler);
   old_millis = millis();                                      //save current milli count to varible
   /**********************
       load varibles from eeprom
@@ -498,7 +498,7 @@ void setup() {
   EEPROM.get(cal_ee_edr, cal_number);                           //get calibration number from eeprom
   old_cal_number = cal_number;                                  //set varible the same as cal number
   EEPROM.get(unit_ee_adr, units);                               //get units 1 = MPH  2= KPH
-  calculate_speed_constant();                                   //calculate the constant used for speed calculation
+  calculateSpeedConstant();                                   //calculate the constant used for speed calculation
   EEPROM.get(fpm_ee_adr, fpm);                                  //feet per minute checkbox status
   EEPROM.get(alarm_ee_adr, alarm_enable);                       //alarm notification 0 = off 1 = on
   EEPROM.get(speed_avg_ee_adr, speed_avg);                      //status of speed average checkbox
@@ -521,7 +521,7 @@ void setup() {
 
   
   // Calibrate the touch screen and set the scaling factors
-  touch_calibrate();    //start the input device
+  touchCalibrate();    //start the input device
   EEPROM.get(upw_ee_adr, user_passcode_int);                    //user pass code saved as an integer, converted and used as string in program
   
   char data_var[8];                                             //create char array to hold value
@@ -565,23 +565,23 @@ void setup() {
 //  timerAlarmEnable(flash_timer);                                             //start the timer               
   
   if (speed_input == 0){
-    enable_radar();                                                     //turn off serial2 and turn on pulse interrupt
+    enableRadar();                                                     //turn off serial2 and turn on pulse interrupt
     }
   else{
-    enable_gps();                                                     //turn on serial2 and turn off pulse interrupt                                              
+    enableGPS();                                                     //turn on serial2 and turn off pulse interrupt                                              
     }
  
   createTitleLine();                                                 //create screen seperator lines
-  build_screen_run();                                                  //build the different screens
-  build_option_screen();                                               //set program options
-  build_screen_target();                                               //set target speed for center of bar graph
-  build_screen_calibrate();                                            //cal number setup with keypad
-  build_field_calibrate();                                             //cal number setup by driving distance
-  build_factory_screen();                                              //factory settings (new user password, touch screen cal.)
-  build_set_target();                                                  //build screen to set target speeds
-  option_screen_off();
+  buildScreenRun();                                                  //build the different screens
+  buildOptionScreen();                                               //set program options
+  buildScreenTarget();                                               //set target speed for center of bar graph
+  buildScreenCalibrate();                                            //cal number setup with keypad
+  buildFieldCalibrate();                                             //cal number setup by driving distance
+  buildFactoryScreen();                                              //factory settings (new user password, touch screen cal.)
+  buildSetTarget();                                                  //build screen to set target speeds
+  optionScreenOff();
 
-  screen_run_on();                                                      //turn on the run screen
+  screenRunOn();                                                      //turn on the run screen
 
   Serial.println(" ");
   Serial.print("File Name - ");                                        //print file name and path to serial monitor
@@ -596,9 +596,9 @@ void setup() {
 //======================= Screen ON/OFF Routines  =================================
 void field_calibrate_on(void) {
   field_calibration_flag = true;                                  //set flag so timer interupt will not reset pulse count
-  screen_calibrate_off();                                         //turn off any other screen that may be on
-  screen_run_off();                                               //"
-  screen_target_off();                                            //"
+  screenCalibrateOff();                                         //turn off any other screen that may be on
+  screenRunOff();                                               //"
+  screenTargetOff();                                            //"
 
   lv_obj_set_pos(title_label, 90, 5);
   lv_label_set_text(title_label, "Field Calibration");              /*Set the text*/
@@ -637,7 +637,7 @@ void field_calibrate_off(void) {                                           //tur
   field_calibration_flag = false;                                       //set flag to flase so timer interupt will process timer interrupt
   Serial.println("line 298");
 }
-void option_screen_off(void) {                                          //hide all objects on option screen
+void optionScreenOff(void) {                                          //hide all objects on option screen
 
   lv_obj_set_hidden(btn_set_exit, true);                        //hide all screen objects that are on the option screen
   lv_obj_set_hidden(cb_mph, true);
@@ -660,9 +660,9 @@ void option_screen_off(void) {                                          //hide a
   lv_obj_set_hidden(cb_gps, true);
 }
 void option_screen_on(void) {                                           //show all hidden objects on option screen
-  screen_calibrate_off();
-  screen_run_off();
-  screen_target_off();
+  screenCalibrateOff();
+  screenRunOff();
+  screenTargetOff();
   field_calibrate_off();
   lv_obj_set_hidden(btn_set_exit, false);                        //show all screen objects that are on the option screen
   lv_obj_set_hidden(cb_mph, false);
@@ -748,7 +748,7 @@ void option_screen_on(void) {                                           //show a
   }
   Serial.println("line 774 end of option_screen_on()");
 }
-void screen_run_off(void) {                                            //turn off all objects on run screen
+void screenRunOff(void) {                                            //turn off all objects on run screen
   lv_label_set_text(title_label, "");
   lv_obj_set_hidden(title_label, true);
   lv_obj_set_hidden(btn_setup, true);
@@ -767,9 +767,9 @@ void screen_run_off(void) {                                            //turn of
   run_screen_flag = 0;                                          //clear flag to disable mph display routine in loop
   digitalWrite(alarm_light,false);                              //turn off alarm light
 }
-void screen_run_on(void) {
+void screenRunOn(void) {
 #if serial_debug
-  Serial.println("screen_run_on() start");
+  Serial.println("screenRunOn() start");
 #endif  
   run_screen_flag = 1;                                                  //turn flag os so speed will display in run screen
   field_cal_flag = 0;                                                   //turn off flag so calibration will not display
@@ -848,10 +848,10 @@ void screen_run_on(void) {
 
  
 #if serial_debug 
-  Serial.println("line 421 screen_run_on * End");
+  Serial.println("line 421 screenRunOn * End");
 #endif
-}          //end of screen_run_on()
-void screen_calibrate_off(void) {                                       //turn  off all objects on "set calibration number" screen
+}          //end of screenRunOn()
+void screenCalibrateOff(void) {                                       //turn  off all objects on "set calibration number" screen
   lv_label_set_text(title_label, "");
   lv_obj_set_hidden(label_cal, true);
   lv_obj_set_hidden(btn_exit, true);
@@ -861,9 +861,9 @@ void screen_calibrate_off(void) {                                       //turn  
 
 }
 void screen_calibrate_on(void) {                                         //turn  on "set calibration number" screen
-  option_screen_off();
-  screen_run_off();
-  screen_target_off();
+  optionScreenOff();
+  screenRunOff();
+  screenTargetOff();
   lv_obj_set_pos(title_label, 100, 5);
   lv_obj_set_hidden(title_label, false);                      //turn on all objects for this screen
   lv_label_set_text(title_label, "Speed Calibration Entry");  //set screen title text
@@ -876,9 +876,9 @@ void screen_calibrate_on(void) {                                         //turn 
   lv_label_set_text(label_cal, text_buff);
 }
 void screen_set_target_on(void){                                                //turn on target screen
-   screen_calibrate_off();
-   option_screen_off();
-   screen_run_off();
+   screenCalibrateOff();
+   optionScreenOff();
+   screenRunOff();
   // lv_obj_set_hidden(title_label3, false); 
    lv_obj_set_hidden(btn_set_alarm_1,false);
    lv_obj_set_hidden(btn_set_alarm_2,false);
@@ -887,9 +887,9 @@ void screen_set_target_on(void){                                                
    lv_obj_set_hidden(label_alarm1,false);
 }
 void screen_target_on(void) {                                            //turn on screen to set multi target speed
-  screen_calibrate_off();
-  option_screen_off();
-  screen_run_off();
+  screenCalibrateOff();
+  optionScreenOff();
+  screenRunOff();
   lv_obj_set_hidden(btn_target_exit, false);                               //show the exit button
   lv_obj_set_hidden(label_units, false);                                   //display mph or kph when setting target speed
   lv_obj_set_hidden(line1, false);
@@ -904,11 +904,11 @@ void screen_target_on(void) {                                            //turn 
 
  // lv_obj_set_hidden(keypad_target, false);                                 //show the keypad
   lv_obj_set_hidden(label_cal, false);
-  screen_set_multi_target_on();                                            //turn on buttons to select target speed 1-4
+  screenSetMultiTargetOn();                                            //turn on buttons to select target speed 1-4
   Serial.println("line 546");                                              //***diagnostic
   
 }
-void screen_target_off(void) {                                       //turn off multiple target buttons
+void screenTargetOff(void) {                                       //turn off multiple target buttons
   lv_label_set_text(title_label, "");
   lv_obj_set_hidden(keypad_target, true);                           //hide keyboard
   lv_obj_set_hidden(label_cal, true);
@@ -916,8 +916,8 @@ void screen_target_off(void) {                                       //turn off 
   lv_obj_set_hidden(btn_target_exit, true);
   lv_obj_set_hidden(label_units, true);                                 //display mph or kph when setting target speed
 }
-void screen_set_multi_target_on(void){                                  //multiple alarm selection buttons
-  option_screen_off();
+void screenSetMultiTargetOn(void){                                  //multiple alarm selection buttons
+  optionScreenOff();
   lv_obj_set_hidden(btn_set_alarm_1, false);        //alarm set button 1
   lv_obj_set_hidden(btn_set_alarm_2, false);        //alarm set button 2
   lv_obj_set_hidden(btn_set_alarm_3, false);        //alarm set button 3
@@ -966,7 +966,7 @@ void screen_factory_off(void) {                                         //turn o
   lv_obj_set_hidden(line2, true);                   //lower screen line above bottom two buttons
   lv_label_set_text(label_speed, "");               //clear this or the password shows up in run screen for 2 seconds
 }
-void build_screen_target(void) {                                        //create objects for screen to enter target speed
+void buildScreenTarget(void) {                                        //create objects for screen to enter target speed
 #if serial_debug  
   Serial.println("line 517");
 #endif
@@ -975,7 +975,7 @@ void build_screen_target(void) {                                        //create
   lv_obj_set_drag(btn_target_exit, false);                              //do not allow dragging of button
   lv_obj_set_pos(btn_target_exit, 380, 2);                              /*Set its position in upper RIGHT corner*/
   lv_obj_set_size(btn_target_exit, 80, 50);                             /*Set its size*/
-  lv_obj_set_event_cb(btn_target_exit, btn_target_exit_cb);             /*Assign an event callback when pressing */
+  lv_obj_set_event_cb(btn_target_exit, btnTargetExitCallback);             /*Assign an event callback when pressing */
   lv_obj_t * label12 = lv_label_create(btn_target_exit, NULL);               /*Add a label to the button*/
   lv_label_set_text(label12, LV_SYMBOL_CLOSE  " Exit");                  /*Set the labels text*/
 
@@ -986,12 +986,12 @@ void build_screen_target(void) {                                        //create
   lv_btnm_set_map(keypad_target, btnm_map);                           //bring in key map to create a numeric keypad to enter data
   lv_obj_set_size(keypad_target, 478, 126);                           /*Set outside dimensions of keyboard*/
   lv_obj_align(keypad_target, NULL, LV_ALIGN_CENTER, 0, 98);          //set position of keypad
-  lv_obj_set_event_cb(keypad_target, target_speed_event_handler);     //callback for keypad presses
+  lv_obj_set_event_cb(keypad_target, targetSpeedEventHandler);     //callback for keypad presses
   lv_obj_set_hidden(keypad_target, true);                             //hide the keypad
   
 }
-void build_factory_screen() {
-  Serial.println("Entering build_factory_screen()");
+void buildFactoryScreen() {
+  Serial.println("Entering buildFactoryScreen()");
   run_screen_flag = 0;                                                 //set flag so main loop will not process speed
   lv_style_copy(&style3, &lv_style_plain);
   style3.text.font = &lv_font_roboto_28;                               //12,16,22,28 built in
@@ -1004,7 +1004,7 @@ void build_factory_screen() {
   lv_obj_set_drag(btn_reset_pw, false);                             //turn drag feature off
   lv_obj_set_pos(btn_reset_pw, 20, 60);                             /*Set its position*/
   lv_obj_set_size(btn_reset_pw, 150, 60);                           /*Set its size*/
-  lv_obj_set_event_cb(btn_reset_pw, fact_opt_cb);                   /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_reset_pw, factoryOptionCallback);                   /*Assign an event callback*/
   lv_obj_t * label21 = lv_label_create(btn_reset_pw, NULL);             /*Add a label to the button*/
   lv_label_set_text(label21,  "Reset PW");                          /*Set the labels text*/
 
@@ -1012,7 +1012,7 @@ void build_factory_screen() {
   lv_obj_set_drag(btn_scr_cal, false);                              //turn drag feature off
   lv_obj_set_pos(btn_scr_cal, 20, 145);                             /*Set its position*/
   lv_obj_set_size(btn_scr_cal, 150, 60);                            /*Set its size*/
-  lv_obj_set_event_cb(btn_scr_cal, fact_opt_cb);                    /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_scr_cal, factoryOptionCallback);                    /*Assign an event callback*/
   lv_obj_t * label22 = lv_label_create(btn_scr_cal, NULL);              /*Add a label to the button*/
   lv_label_set_text(label22,  "Touch Cal.");                        /*Set the labels text*/
 
@@ -1020,7 +1020,7 @@ void build_factory_screen() {
   lv_obj_set_drag(btn_fact_exit, false);                            //turn drag feature off
   lv_obj_set_pos(btn_fact_exit, 20, 250);                           /*Set its position*/
   lv_obj_set_size(btn_fact_exit, 150, 60);                          /*Set its size*/
-  lv_obj_set_event_cb(btn_fact_exit, fact_opt_cb);                  /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_fact_exit, factoryOptionCallback);                  /*Assign an event callback*/
   lv_obj_t * label20 = lv_label_create(btn_fact_exit, NULL);            /*Add a label to the button*/
   lv_label_set_text(label20, LV_SYMBOL_DOWNLOAD "  SAVE");         /*Set the labels text*/
 
@@ -1028,7 +1028,7 @@ void build_factory_screen() {
   lv_obj_set_drag(btn_reset, false);                            //turn drag feature off
   lv_obj_set_pos(btn_reset, 310, 250);                           /*Set its position*/
   lv_obj_set_size(btn_reset, 150, 60);                          /*Set its size*/
-  lv_obj_set_event_cb(btn_reset, fact_opt_cb);                  /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_reset, factoryOptionCallback);                  /*Assign an event callback*/
   lv_obj_t * label24 = lv_label_create(btn_reset, NULL);            /*Add a label to the button*/
   lv_label_set_text(label24, LV_SYMBOL_REFRESH " Reset");         /*Set the labels text*/
 
@@ -1037,7 +1037,7 @@ void build_factory_screen() {
   lv_btnm_set_map(keypad_pw, btnm_map);                              //create a numeric keypad to enter data
   lv_obj_set_size(keypad_pw, 478, 126);                              /*Set keypad size*/
   lv_obj_align(keypad_pw, NULL, LV_ALIGN_CENTER, 0, 98);             //set position of keypad
-  lv_obj_set_event_cb(keypad_pw, new_pw_event_handler);              //callback for keypad presses
+  lv_obj_set_event_cb(keypad_pw, newPasswordEventHandler);              //callback for keypad presses
   lv_obj_set_hidden(keypad_pw, true);                                 //hide keypad after creating
 
   pw_but_text = lv_label_create(lv_scr_act(), NULL);                     /*Add a label to identify current password next to reset pw button*/
@@ -1056,13 +1056,13 @@ void build_factory_screen() {
 
   screen_factory_off();                                                   ///turn off all objects after build
 }
-void fact_opt_cb(lv_obj_t * obj, lv_event_t event) {                      //callback routine for factory option screen
-  Serial.println("fact_opt_cb - line 637");
+void factoryOptionCallback(lv_obj_t * obj, lv_event_t event) {                      //callback routine for factory option screen
+  Serial.println("factoryOptionCallback - line 637");
   switch (event) {
     case LV_EVENT_PRESSED:
       if (obj == btn_fact_exit) {                                   //Exit button
         screen_factory_off();                                       //turn off all objects on screen
-        screen_run_on();                                             //go back to run screen
+        screenRunOn();                                             //go back to run screen
       }
 
       if (obj == btn_reset) {                                      //reset computer
@@ -1072,7 +1072,7 @@ void fact_opt_cb(lv_obj_t * obj, lv_event_t event) {                      //call
       if (obj == btn_scr_cal) {                                     //touch screen calibration
         screen_factory_off();
         var_REPEAT_CAL = true;                                     //set flag so touch screen routine will run again
-        touch_calibrate();                                         //routine to calibrate touch screen
+        touchCalibrate();                                         //routine to calibrate touch screen
         screen_factory_on();
       }
 
@@ -1095,7 +1095,7 @@ void fact_opt_cb(lv_obj_t * obj, lv_event_t event) {                      //call
   }
 
 }
-void new_pw_event_handler(lv_obj_t * obj, lv_event_t event) {             //event handler for new password entry
+void newPasswordEventHandler(lv_obj_t * obj, lv_event_t event) {             //event handler for new password entry
   char hold[2];                                                          //temp array to hold the x value
   if (event == LV_EVENT_VALUE_CHANGED) {
     const char     *txt = lv_btnm_get_active_btn_text(obj);                           //get the text value of pressed button
@@ -1127,7 +1127,7 @@ void new_pw_event_handler(lv_obj_t * obj, lv_event_t event) {             //even
           EEPROM.put(upw_ee_adr, xvar);                                 //save new user password to eeprom as integer value
           EEPROM.commit();
           printf("%d is the new password **********\n", user_passcode.toInt());     //***diagnostic code
-          screen_run_off();                                            //turn off objects used from run screen
+          screenRunOff();                                            //turn off objects used from run screen
           lv_obj_set_hidden(keypad_pw, true);                          //hide the keypad
           screen_factory_on();                                         //show the factory screen
         }
@@ -1140,8 +1140,8 @@ void new_pw_event_handler(lv_obj_t * obj, lv_event_t event) {             //even
     }
   }
 }
-void build_option_screen() {
-  Serial.println("Entering build_option_screen()");
+void buildOptionScreen() {
+  Serial.println("Entering buildOptionScreen()");
   run_screen_flag = 0;                                            //set flag to zero so mph calcultion routines will shut down
   lv_style_copy(&style3, &lv_style_plain);
   style3.text.font = &lv_font_roboto_28;                         //12,16,22,28 built in
@@ -1187,7 +1187,7 @@ void build_option_screen() {
   lv_obj_set_drag(btn_set_exit, false);                       //turn drag feature off
   lv_obj_set_pos(btn_set_exit, 10, 250);                      /*Set its position*/
   lv_obj_set_size(btn_set_exit, 150, 60);                     /*Set its size*/
-  lv_obj_set_event_cb(btn_set_exit, unit_event_cb);           /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_set_exit, unitEventCallback);           /*Assign an event callback*/
   lv_obj_set_style(btn_set_exit, &style_shadow);
   lv_obj_t * label7 = lv_label_create(btn_set_exit, NULL);        /*Add a label to the button*/
   //  lv_obj_set_style(label7, &style3);
@@ -1205,7 +1205,7 @@ void build_option_screen() {
   lv_obj_set_pos(btn_target_set, 177, 250);                     /*Set its position*/
   lv_obj_set_size(btn_target_set, 140, 60);                     /*Set its size*/
   lv_obj_set_style(btn_target_set, &style_shadow);
-  lv_obj_set_event_cb(btn_target_set, unit_event_cb);           //declare the callback routine
+  lv_obj_set_event_cb(btn_target_set, unitEventCallback);           //declare the callback routine
   lv_obj_t * label8 = lv_label_create(btn_target_set, NULL);       /*Add a label to the button*/
   lv_label_set_text(label8, "Set Target");                     /*Set the labels text*/
 
@@ -1218,7 +1218,7 @@ void build_option_screen() {
   lv_obj_set_pos(btn_preAlarm_set, 337, 250);                     /*Set its position*/
   lv_obj_set_size(btn_preAlarm_set, 140, 60);                     /*Set its size*/
   lv_obj_set_style(btn_preAlarm_set, &style_shadow);
-  lv_obj_set_event_cb(btn_preAlarm_set, unit_event_cb);           //declare the callback routine
+  lv_obj_set_event_cb(btn_preAlarm_set, unitEventCallback);           //declare the callback routine
   lv_obj_t * label9 = lv_label_create(btn_preAlarm_set, NULL);       /*Add a label to the button*/
   lv_label_set_text(label9, "Pre-Alarm");                     /*Set the labels text*/
 
@@ -1257,7 +1257,7 @@ void build_option_screen() {
   cb_mph = lv_cb_create(lv_scr_act(), NULL);         //checkbox for units MPH
   lv_cb_set_text(cb_mph, "MPH");
   lv_obj_set_pos(cb_mph, 10, 46);                                /*Set its position*/
-  lv_obj_set_event_cb(cb_mph, unit_event_cb);
+  lv_obj_set_event_cb(cb_mph, unitEventCallback);
   lv_obj_set_hidden(cb_mph, true);
   if (units == 2) {                                            //if units is kph (2)
     lv_cb_set_checked(cb_mph, false);
@@ -1269,7 +1269,7 @@ void build_option_screen() {
   cb_kph = lv_cb_create(lv_scr_act(), NULL);          //checkbox for units KPH
   lv_cb_set_text(cb_kph, "km/h");
   lv_obj_set_pos(cb_kph, 10, 90);                               /*Set its position*/
-  lv_obj_set_event_cb(cb_kph, unit_event_cb);
+  lv_obj_set_event_cb(cb_kph, unitEventCallback);
   lv_obj_set_hidden(cb_kph, true);
   if (units == 1) {                                             //if units is  mph (1)
     lv_cb_set_checked(cb_kph, false);
@@ -1281,7 +1281,7 @@ void build_option_screen() {
   cb_distance = lv_cb_create(lv_scr_act(), NULL);      //checkbox for distance (not enabled )
   lv_cb_set_text(cb_distance, "Distance");
   lv_obj_set_pos(cb_distance, 10, 180);                           /*Set its position*/
-  lv_obj_set_event_cb(cb_distance, unit_event_cb);
+  lv_obj_set_event_cb(cb_distance, unitEventCallback);
   lv_obj_set_hidden(cb_distance, true);
   if (cb_distance == 0) {
     lv_cb_set_checked(cb_distance, false);
@@ -1293,7 +1293,7 @@ void build_option_screen() {
   cb_security = lv_cb_create(lv_scr_act(), NULL);      //checkbox for password
   lv_cb_set_text(cb_security, "Password");
   lv_obj_set_pos(cb_security, 190, 46);                           /*Set its position*/
-  lv_obj_set_event_cb(cb_security, unit_event_cb);
+  lv_obj_set_event_cb(cb_security, unitEventCallback);
   lv_obj_set_hidden(cb_security, true);
   if (cb_security == 0) {
     lv_cb_set_checked(cb_security, false);
@@ -1306,7 +1306,7 @@ void build_option_screen() {
   cb_graph = lv_cb_create(lv_scr_act(), NULL);        //checkbox for units KPH
   lv_cb_set_text(cb_graph, "Bar Graph");
   lv_obj_set_pos(cb_graph, 190, 90);                           /*Set its position*/
-  lv_obj_set_event_cb(cb_graph, unit_event_cb);
+  lv_obj_set_event_cb(cb_graph, unitEventCallback);
   lv_obj_set_hidden(cb_graph, true);
   if (cb_graph == 0) {
     lv_cb_set_checked(cb_graph, false);
@@ -1318,7 +1318,7 @@ void build_option_screen() {
   cb_alarm = lv_cb_create(lv_scr_act(), NULL);        //checkbox for alarm functon
   lv_cb_set_text(cb_alarm, "Alarm");
   lv_obj_set_pos(cb_alarm, 360, 90);                           /*Set its position*/
-  lv_obj_set_event_cb(cb_alarm, unit_event_cb);
+  lv_obj_set_event_cb(cb_alarm, unitEventCallback);
   lv_obj_set_hidden(cb_alarm, true);
   if (alarm_enable == 0) {
     lv_cb_set_checked(cb_graph, false);
@@ -1332,7 +1332,7 @@ void build_option_screen() {
   cb_feet_per_min = lv_cb_create(lv_scr_act(), NULL);   //checkbox for distance per minute
   lv_cb_set_text(cb_feet_per_min, "Distance/minute");
   lv_obj_set_pos(cb_feet_per_min, 190, 136);                      /*Set its position*/
-  lv_obj_set_event_cb(cb_feet_per_min, unit_event_cb);
+  lv_obj_set_event_cb(cb_feet_per_min, unitEventCallback);
   lv_obj_set_hidden(cb_feet_per_min, true);
   if (fpm == 0) {
     lv_cb_set_checked(cb_feet_per_min, false);
@@ -1344,7 +1344,7 @@ void build_option_screen() {
   cb_speed_avg = lv_cb_create(lv_scr_act(), NULL);   //checkbox for avg/speed
   lv_cb_set_text(cb_speed_avg, "Avg/Speed");
   lv_obj_set_pos(cb_speed_avg, 10, 136);                      /*Set its position*/
-  lv_obj_set_event_cb(cb_speed_avg, unit_event_cb);           //callback routine
+  lv_obj_set_event_cb(cb_speed_avg, unitEventCallback);           //callback routine
   lv_obj_set_hidden(cb_speed_avg, true);
   if (speed_avg == 0) {                                             //check for saved check box status
     lv_cb_set_checked(cb_speed_avg, false);
@@ -1356,12 +1356,12 @@ void build_option_screen() {
   cb_radar = lv_cb_create(lv_scr_act(), NULL);   //checkbox for radar input
   lv_cb_set_text(cb_radar, "Radar");
   lv_obj_set_pos(cb_radar, 10, 185);                      /*Set its position*/
-  lv_obj_set_event_cb(cb_radar, unit_event_cb);           //callback routine
+  lv_obj_set_event_cb(cb_radar, unitEventCallback);           //callback routine
 
   cb_gps = lv_cb_create(lv_scr_act(), NULL);   //checkbox for gps input
   lv_cb_set_text(cb_gps, "GPS Sensor");
   lv_obj_set_pos(cb_gps, 190, 185);                      /*Set its position*/
-  lv_obj_set_event_cb(cb_gps, unit_event_cb);           //callback routine
+  lv_obj_set_event_cb(cb_gps, unitEventCallback);           //callback routine
 
   if (speed_input == 0){                               //based on saved eeprom value set the speed input checkboxes
      lv_cb_set_checked(cb_radar, true);
@@ -1373,7 +1373,7 @@ void build_option_screen() {
     }
   
 }
-void build_screen_run(void) {
+void buildScreenRun(void) {
 #if serial_debug
   Serial.println("Build Screen run, line 651");
 #endif
@@ -1587,7 +1587,7 @@ void build_screen_run(void) {
   lv_obj_set_drag(btn_setup, false);
   lv_obj_set_pos(btn_setup, 10, 10);                              /*Set its position in upper left corner*/
   lv_obj_set_size(btn_setup, 50, 50);                             /*Set its size*/
-  lv_obj_set_event_cb(btn_setup, my_start_btn_cb);                /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_setup, startButtonCallback);                /*Assign an event callback*/
   lv_obj_set_style(btn_setup, &style_shadow);
   lv_obj_t * label1 = lv_label_create(btn_setup, NULL);               /*Add a label to the button*/
   lv_obj_set_style(label1, &style1);
@@ -1601,7 +1601,7 @@ void build_screen_run(void) {
   lv_obj_set_drag(btn_reset_dist, false);
   lv_obj_set_pos(btn_reset_dist, 350, 2);                              /*Set its position in upper right corner*/
   lv_obj_set_size(btn_reset_dist, 120, 33);                             /*Set its size*/
-  lv_obj_set_event_cb(btn_reset_dist, btn_reset_dist_cb);                /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_reset_dist, btnResetDistanceCallback);                /*Assign an event callback*/
   lv_obj_set_style(btn_reset_dist, &style_shadow);
   lv_obj_t * label13 = lv_label_create(btn_reset_dist, NULL);               /*Add a label to the button*/
   lv_obj_set_style(label13, &style1);
@@ -1610,7 +1610,7 @@ void build_screen_run(void) {
   /*******************
      speed bar display
   ********************/
-  speed_bar();                                                            //routine to create speed bar
+  speedBar();                                                            //routine to create speed bar
   if (graph == 1) {
     lv_obj_set_hidden(bar_speed, false);                             //show bar graph
     lv_obj_set_hidden(label_arrow, false);                           //display arrow in center of bar graph
@@ -1624,13 +1624,13 @@ void build_screen_run(void) {
     lv_obj_set_hidden(label_bar_max, true);                        //show max label under bar graph
   }
 
-}//end of build_screen_run()
-void build_screen_calibrate(void) {
+}//end of buildScreenRun()
+void buildScreenCalibrate(void) {
   // lv_obj_set_hidden(bar_speed,true);
   old_cal_number = cal_number;
   run_screen_flag = 0;                                          //set flag so mph routine in loop will not run
 #if serial_debug
-  Serial.println("Entering build_screen_calibrate() - 362");
+  Serial.println("Entering buildScreenCalibrate() - 362");
 #endif
 
   static lv_style_t style3;                                      /*Declare a new style. Should be `static`*/
@@ -1688,7 +1688,7 @@ void build_screen_calibrate(void) {
   lv_obj_set_pos(btn_exit, 10, 250);                           /*Set its position*/
   lv_obj_set_size(btn_exit, 140, 60);                          /*Set its size*/
   // lv_obj_set_event_cb(btn_exit, btn_event_cb1);                 /*Assign a callback to the button*/
-  lv_obj_set_event_cb(btn_exit, screen_calibrate_cb);              /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_exit, screenCalibrateCallback);              /*Assign an event callback*/
   lv_obj_set_style(btn_exit, &style_shadow);
 
   lv_obj_t * label1 = lv_label_create(btn_exit, NULL);          /*Create and Add a label to the button*/
@@ -1706,7 +1706,7 @@ void build_screen_calibrate(void) {
   lv_obj_set_pos(btn_field_cal, 167, 250);                           /*Set its position*/
   lv_obj_t * label9 = lv_label_create(btn_field_cal, NULL);          /*Add a label to the button*/
   lv_label_set_text(label9, "Field Cal.");       /*Set the labels text*/
-  lv_obj_set_event_cb(btn_field_cal, screen_calibrate_cb);              /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_field_cal, screenCalibrateCallback);              /*Assign an event callback*/
   lv_obj_set_hidden(btn_field_cal, true);
 
 
@@ -1720,15 +1720,15 @@ void build_screen_calibrate(void) {
   lv_obj_set_pos(btn_set_cal, 321, 250);                           /*Set its position*/
   lv_obj_t * label2 = lv_label_create(btn_set_cal, NULL);          /*Add a label to the button*/
   lv_label_set_text(label2, LV_SYMBOL_KEYBOARD "  SET");       /*Set the labels text*/
-  lv_obj_set_event_cb(btn_set_cal, btn_set_cal_cb);              /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_set_cal, btnSetCalibrationCallback);              /*Assign an event callback*/
   lv_obj_set_hidden(btn_set_cal, true);
 
 
 
 }
-void build_field_calibrate(void) {
+void buildFieldCalibrate(void) {
 #if serial_debug
-  Serial.println("Entering build_field_calibrate() - 1603");
+  Serial.println("Entering buildFieldCalibrate() - 1603");
 #endif
   //create horizontal line for 300 ft
   static lv_style_t style_line;
@@ -1785,7 +1785,7 @@ void build_field_calibrate(void) {
   lv_obj_set_drag(field_save_btn, false);                            //turn drag feature off
   lv_obj_set_pos(field_save_btn, 370, 255);                           /*Set its position*/
   lv_obj_set_size(field_save_btn, 100, 60);                          /*Set its size*/
-  lv_obj_set_event_cb(field_save_btn, field_calibrate_cb);                 /*Assign a callback to the button*/
+  lv_obj_set_event_cb(field_save_btn, fieldCalibrateCallback);                 /*Assign a callback to the button*/
   lv_obj_set_style(field_save_btn, &style_shadow);
   lv_obj_t * label10 = lv_label_create(field_save_btn, NULL);          /*Add a label to the button*/
   lv_label_set_text(label10, "Save");                               /*Set the labels text*/
@@ -1795,7 +1795,7 @@ void build_field_calibrate(void) {
   lv_obj_set_drag(field_start_btn, false);                            //turn drag feature off
   lv_obj_set_pos(field_start_btn, 5, 50);                           /*Set its position*/
   lv_obj_set_size(field_start_btn, 100, 55);                          /*Set its size*/
-  lv_obj_set_event_cb(field_start_btn, field_calibrate_cb);                 /*Assign a callback to the button*/
+  lv_obj_set_event_cb(field_start_btn, fieldCalibrateCallback);                 /*Assign a callback to the button*/
   lv_obj_set_style(field_start_btn, &style_shadow);
   lv_obj_t * label11 = lv_label_create(field_start_btn, NULL);          /*Add a label to the button*/
   lv_label_set_text(label11, "Start");
@@ -1805,7 +1805,7 @@ void build_field_calibrate(void) {
   lv_obj_set_drag(field_end_btn, false);                            //turn drag feature off
   lv_obj_set_pos(field_end_btn, 370, 50);                           /*Set its position*/
   lv_obj_set_size(field_end_btn, 100, 55);                          /*Set its size*/
-  lv_obj_set_event_cb(field_end_btn, field_calibrate_cb);                 /*Assign a callback to the button*/
+  lv_obj_set_event_cb(field_end_btn, fieldCalibrateCallback);                 /*Assign a callback to the button*/
   lv_obj_set_style(field_end_btn, &style_shadow);
   lv_obj_t * label12 = lv_label_create(field_end_btn, NULL);          /*Add a label to the button*/
   lv_label_set_text(label12, "End");
@@ -1815,7 +1815,7 @@ void build_field_calibrate(void) {
   lv_obj_set_drag(field_cancel_btn, false);                            //turn drag feature off
   lv_obj_set_pos(field_cancel_btn, 5, 255);                           /*Set its position*/
   lv_obj_set_size(field_cancel_btn, 100, 60);                          /*Set its size*/
-  lv_obj_set_event_cb(field_cancel_btn, field_calibrate_cb);                 /*Assign a callback to the button*/
+  lv_obj_set_event_cb(field_cancel_btn, fieldCalibrateCallback);                 /*Assign a callback to the button*/
   lv_obj_set_style(field_cancel_btn, &style_shadow);
   lv_obj_t * label13 = lv_label_create(field_cancel_btn, NULL);          /*Add a label to the button*/
   lv_label_set_text(label13, LV_SYMBOL_CLOSE " Exit");
@@ -1833,13 +1833,13 @@ void build_field_calibrate(void) {
   lv_label_set_text(label_cal_inst, "1.  Measure off 300 feet\n2.  Press START\n3.  Drive 300 feet\n4.  Press STOP\n5.  Press SAVE");                 /*Set the text*/
   lv_obj_set_hidden(label_cal_inst, true);                           //hide text
 }
-void build_set_target(void){                                                //screen to set multiple target speeds
+void buildSetTarget(void){                                                //screen to set multiple target speeds
    int hrow = 215;                                                       //locate buttons to bottom of screen
   ma_keypad = lv_btnm_create(lv_scr_act(), NULL);
   lv_btnm_set_map(ma_keypad, btnm_map);                                 //create a numeric keypad to enter data
   lv_obj_set_size(ma_keypad, 478, 126);                                  /*Set keypad size*/
   lv_obj_align(ma_keypad, NULL, LV_ALIGN_CENTER, 0, 98);                 //set position of keypad
-  lv_obj_set_event_cb(ma_keypad, ma_keyboard_cb);                       //callback for multi alarm keypad entry
+  lv_obj_set_event_cb(ma_keypad, maKeyboardCallback);                       //callback for multi alarm keypad entry
   lv_obj_set_hidden(ma_keypad, true);                                   //hide object on build     
 
   label_alarm1 = lv_label_create(lv_scr_act(), NULL);                //create a label to display preset alarm speed
@@ -1854,7 +1854,7 @@ void build_set_target(void){                                                //sc
   lv_obj_set_drag(btn_set_alarm_1, false);                             //turn drag feature off
   lv_obj_set_pos(btn_set_alarm_1, 5, hrow);                             /*Set its position*/
   lv_obj_set_size(btn_set_alarm_1, 88, 100);                           /*Set its size*/
-  lv_obj_set_event_cb(btn_set_alarm_1, mult_alarm_cb);                   /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_set_alarm_1, multAlarmCallback);                   /*Assign an event callback*/
   label_set_1 = lv_label_create(btn_set_alarm_1, NULL);             /*Add a label to the button*/
   lv_label_set_text(label_set_1,  "Alarm\n    1");   
   lv_obj_set_hidden(btn_set_alarm_1, true);                           //hide object on build         
@@ -1863,7 +1863,7 @@ void build_set_target(void){                                                //sc
   lv_obj_set_drag(btn_set_alarm_2, false);                             //turn drag feature off
   lv_obj_set_pos(btn_set_alarm_2, 100, hrow);                             /*Set its position*/
   lv_obj_set_size(btn_set_alarm_2, 88, 100);                           /*Set its size*/
-  lv_obj_set_event_cb(btn_set_alarm_2, mult_alarm_cb);                   /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_set_alarm_2, multAlarmCallback);                   /*Assign an event callback*/
   label_set_2 = lv_label_create(btn_set_alarm_2, NULL);             /*Add a label to the button*/
   lv_label_set_text(label_set_2,  "Alarm\n    2");
  lv_obj_set_hidden(btn_set_alarm_2, true);                      //hide object on build                 
@@ -1872,7 +1872,7 @@ void build_set_target(void){                                                //sc
   lv_obj_set_drag(btn_set_alarm_3, false);                      //turn drag feature off
   lv_obj_set_pos(btn_set_alarm_3, 195, hrow);                   /*Set its position*/
   lv_obj_set_size(btn_set_alarm_3, 88, 100);                    /*Set its size*/
-  lv_obj_set_event_cb(btn_set_alarm_3, mult_alarm_cb);            /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_set_alarm_3, multAlarmCallback);            /*Assign an event callback*/
   label_set_3 = lv_label_create(btn_set_alarm_3, NULL);         /*Add a label to the button*/
   lv_label_set_text(label_set_3,  "Alarm\n     3");  
   lv_obj_set_hidden(btn_set_alarm_3, true);                      //hide object on build   
@@ -1881,7 +1881,7 @@ void build_set_target(void){                                                //sc
   lv_obj_set_drag(btn_set_alarm_4, false);                       //turn drag feature off
   lv_obj_set_pos(btn_set_alarm_4, 290, hrow);                    /*Set its position*/
   lv_obj_set_size(btn_set_alarm_4, 88, 100);                     /*Set its size*/
-  lv_obj_set_event_cb(btn_set_alarm_4, mult_alarm_cb);             /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_set_alarm_4, multAlarmCallback);             /*Assign an event callback*/
   label_set_4 = lv_label_create(btn_set_alarm_4, NULL);          /*Add a label to the button*/
   lv_label_set_text(label_set_4,  "Alarm\n    4"); 
    lv_obj_set_hidden(btn_set_alarm_4, true);                      //hide object on build   
@@ -1890,15 +1890,15 @@ void build_set_target(void){                                                //sc
   lv_obj_set_drag(btn_set_alarm_exit, false);                     //turn drag feature off
   lv_obj_set_pos(btn_set_alarm_exit, 385, hrow);                  /*Set its position*/
   lv_obj_set_size(btn_set_alarm_exit, 88, 100);                   /*Set its size*/
-  lv_obj_set_event_cb(btn_set_alarm_exit, mult_alarm_cb);           /*Assign an event callback*/
+  lv_obj_set_event_cb(btn_set_alarm_exit, multAlarmCallback);           /*Assign an event callback*/
   lv_obj_t * label30 = lv_label_create(btn_set_alarm_exit, NULL); /*Add a label to the button*/
   lv_label_set_text(label30,"    " LV_SYMBOL_DOWNLOAD "\n SAVE"); /*Set the labels text*/
   lv_obj_set_hidden(btn_set_alarm_exit, true);                    //hide object on build   
 }
-void field_calibrate_cb(lv_obj_t * obj, lv_event_t event) {                    // call back for "Field Calibrate" screen
+void fieldCalibrateCallback(lv_obj_t * obj, lv_event_t event) {                    // call back for "Field Calibrate" screen
   switch (event) {
     case LV_EVENT_PRESSED:
-      Serial.println("field_calibrate_cb - line 1148");
+      Serial.println("fieldCalibrateCallback - line 1148");
 
       if (obj == field_cancel_btn) {                                          //
         field_calibrate_off();                                                   //close field calibration window
@@ -1926,7 +1926,7 @@ void field_calibrate_cb(lv_obj_t * obj, lv_event_t event) {                    /
           cal_number = pulse;                            //assingn new cal number based on field cal run
           EEPROM.put(0x05, cal_number);                  //save calibrtion value to eeprom if changed
           EEPROM.commit();
-          calculate_speed_constant();                    //calculate new speed constant
+          calculateSpeedConstant();                    //calculate new speed constant
           messbox_start_run = lv_mbox_create(lv_disp_get_scr_act(NULL), NULL);   //create a message box
           lv_obj_set_width(messbox_start_run, 350);                                         //width of message box
           lv_mbox_set_text(messbox_start_run, "New calibration number saved!");
@@ -1965,14 +1965,14 @@ void field_calibrate_cb(lv_obj_t * obj, lv_event_t event) {                    /
 
   }
 }
-void screen_calibrate_cb(lv_obj_t *obj, lv_event_t event) {
+void screenCalibrateCallback(lv_obj_t *obj, lv_event_t event) {
     // Callback function for "Screen Calibrate" (distance calibration)
     if (event == LV_EVENT_PRESSED) {
         if (obj == btn_exit) {
             // Exit button
-            Serial.println("screen_calibrate_cb - line 1118");
-            screen_calibrate_off(); // Turn off all objects on screen
-            screen_run_on();        // Go back to run screen
+            Serial.println("screenCalibrateCallback - line 1118");
+            screenCalibrateOff(); // Turn off all objects on screen
+            screenRunOn();        // Go back to run screen
         } else if (obj == btn_field_cal) {
             Serial.println("line 900");
             field_calibrate_on();
@@ -2140,7 +2140,7 @@ void loop() {
 
 }//end of loop()
 //=====================  Functions  ==================================
-void mult_alarm_cb(lv_obj_t * btn, lv_event_t event){                           //call back for multi alarm buttons
+void multAlarmCallback(lv_obj_t * btn, lv_event_t event){                           //call back for multi alarm buttons
   int h_pos = 390;                                                              //position to relocate button when pressed to show numeric keypad
   int v_pos = 5;
   if (btn == btn_set_alarm_1) {                                                 //if the "Alarm 1" button was pressed
@@ -2225,7 +2225,7 @@ void mult_alarm_cb(lv_obj_t * btn, lv_event_t event){                           
   }
 }
 
-void ma_keyboard_cb(lv_obj_t * obj, lv_event_t event){               //call back from multi alarm keypad to enter alarm speed
+void maKeyboardCallback(lv_obj_t * obj, lv_event_t event){               //call back from multi alarm keypad to enter alarm speed
 
   if (event == LV_EVENT_VALUE_CHANGED) {                                   //if a key was pressed
     Serial.println("line 2245");
@@ -2328,7 +2328,7 @@ void ma_keyboard_cb(lv_obj_t * obj, lv_event_t event){               //call back
   }
   Serial.println("line 2346 - end of ma_keyboard call back");
 }
-void test_flash_alarm(void){
+void testFlashAlarm(void){
    digitalWrite(aux_light,false);                  //turn off aux output
    delay(150);
    digitalWrite(aux_light,true);                  //turn off aux output
@@ -2351,28 +2351,28 @@ void test_flash_alarm(void){
    delay(150);
    digitalWrite(aux_light,false);
 }
-void enable_gps(void){
+void enableGPS(void){
       detachInterrupt(digitalPinToInterrupt(25));                                   //turn off pulse interrupt                              
       Serial2.end(); 
       Serial2.begin(19200,SERIAL_8N1,25,22);                                       //start serial port to  read gps string
       
 }
-void enable_radar(void){
+void enableRadar(void){
      Serial.println("enable wheel pulse interput");
      attachInterrupt(digitalPinToInterrupt(25), onSpeedPulse, RISING);                //turn on pulse interrupt
 }
-void btn_reset_dist_cb(lv_obj_t * btn, lv_event_t event) {                          //distance reset button callback for button in upper right corner of  run screen
-  Serial.println("line 1180 btn_reset_dist_cb");                                    //***disagnostic
+void btnResetDistanceCallback(lv_obj_t * btn, lv_event_t event) {                          //distance reset button callback for button in upper right corner of  run screen
+  Serial.println("line 1180 btnResetDistanceCallback");                                    //***disagnostic
   
 }
-void calculate_speed_constant(void) {                                               //calculate the speed constant
+void calculateSpeedConstant(void) {                                               //calculate the speed constant
   speed_constant = (float(cal_number) * 17.6 ) / 3600;                              //divide pulses recieved in one second by this constant to get mph
   pulse_distance = 3600 / (float)cal_number;                                        //calculate the distance of one pulse
   Serial.println("+++++++++++++++++++ Start up ++++++++++++++++++++++++");
   Serial.print("speed_constant =  ");
   Serial.println(speed_constant);
 }
-void speed_bar(void) {                                                              //speed bar object setup
+void speedBar(void) {                                                              //speed bar object setup
   lv_bar_set_range(bar_speed, 0, (int)((2 * speed_target) * 10));                   //set max for 2 times target speed
 #if serial_debug  
   Serial.printf("line 757 target speed - %d/n", (int)speed_target);
@@ -2380,18 +2380,18 @@ void speed_bar(void) {                                                          
   lv_obj_set_size(bar_speed, 470, 75);                                              //set size of bar
   lv_obj_align(bar_speed, NULL, LV_ALIGN_CENTER, 0, 90);                            //set location of bar
 }
-void lv_ex_mbox_1(void) {                                                           //message box with three buttons
+void createMessageBox(void) {                                                           //message box with three buttons
   static const char * btns[] = {"Calibrate", "Options", "Close", ""};               //buttons will be created for each name in array
   lv_obj_set_hidden(btn_setup, true);                                               //hide setup button while this box is up
   mbox1 = lv_mbox_create(lv_disp_get_scr_act(NULL), NULL);   //create an object named'mbox1'
   lv_mbox_set_text(mbox1, "Select Function"); //add text to message box
   lv_mbox_add_btns(mbox1, btns);                                                    //add buttons to message box
   lv_obj_set_width(mbox1, 480);                                                     //width of message box
-  lv_obj_set_event_cb(mbox1, mbox1_handler_cb);                                     //callback routine to call
+  lv_obj_set_event_cb(mbox1, messageBoxHandlerCallback);                                     //callback routine to call
   lv_obj_align(mbox1, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, -5);                         /*Align to bottom of screen centered*/
   strcpy(text_buff, "");                                                            //clear buffer used to read keypad
 }
-static void lv_security_code(void) {                                              //keypad entry for security password
+static void displaySecurityCode(void) {                                              //keypad entry for security password
 
   //create keypad for security code entry
   Serial.println("line 490");
@@ -2408,11 +2408,11 @@ static void lv_security_code(void) {                                            
   lv_btnm_set_map(keypad, btnm_map);                                 //create a numeric keypad to enter data
   lv_obj_set_size(keypad, 478, 126);                                  /*Set keypad size*/
   lv_obj_align(keypad, NULL, LV_ALIGN_CENTER, 0, 98);                 //set position of keypad
-  lv_obj_set_event_cb(keypad, security_event_handler);                //callback for keypad presses
+  lv_obj_set_event_cb(keypad, securityEventHandler);                //callback for keypad presses
   strcpy(temp_buff, "");                                              //clear buffer
   Serial.println("line 512");
 }
-static void security_event_handler(lv_obj_t * obj, lv_event_t event) {            //callback for keypad on password screen
+static void securityEventHandler(lv_obj_t * obj, lv_event_t event) {            //callback for keypad on password screen
   char hold[10];                                                                  //temp array to hold the x value
   char str_temp[] = "";
   if (event == LV_EVENT_VALUE_CHANGED) {
@@ -2437,8 +2437,8 @@ static void security_event_handler(lv_obj_t * obj, lv_event_t event) {          
 
         if (*txt == 'E') {                                                 //enter key pressed?
           if (String(temp_buff) == "2001E") {                            //backdoor passcode
-            screen_run_off();                                            //turn off objects on run screen
-            //option_screen_off();
+            screenRunOff();                                            //turn off objects on run screen
+            //optionScreenOff();
             lv_obj_set_hidden(keypad, true);                             //hide the keypad that is currently being shown
             screen_factory_on();                                         //show the factory screen
           }
@@ -2446,11 +2446,11 @@ static void security_event_handler(lv_obj_t * obj, lv_event_t event) {          
           Serial.println("line 1637");
           if (String(temp_buff) == String(user_passcode)) {                            //does string match the security code?
             Serial.println("Successful security code - 676");
-            screen_calibrate_off();
+            screenCalibrateOff();
             lv_obj_set_pos(title_label, 125, 5);
             lv_label_set_text(title_label, "***  SETUP  ***");            //display text at top of screen
             lv_label_set_text(label_speed, "");
-            lv_ex_mbox_1();                                           //show popup with 3 buttons for setup
+            createMessageBox();                                           //show popup with 3 buttons for setup
             lv_obj_set_hidden(option_descrip_text, false);            //show option description text
             lv_obj_set_hidden(calibrate_descrip_text, false);
             lv_obj_set_hidden(close_descrip_text, false);
@@ -2466,9 +2466,9 @@ static void security_event_handler(lv_obj_t * obj, lv_event_t event) {          
               lv_mbox_start_auto_close(messbox_invalid, 3000);
               lv_mbox_set_anim_time(messbox_invalid, 1500);
               lv_obj_align(messbox_invalid, NULL, LV_ALIGN_CENTER, -30, 0);
-              screen_calibrate_off();                                                        //turn off all items on calibrae screen
+              screenCalibrateOff();                                                        //turn off all items on calibrae screen
               lv_obj_set_hidden(keypad, true);                                               //turn off keypad
-              screen_run_on();
+              screenRunOn();
             }//goto run screen
           }
         }
@@ -2476,7 +2476,7 @@ static void security_event_handler(lv_obj_t * obj, lv_event_t event) {          
     }
   }
 }
-static void mbox1_handler_cb(lv_obj_t * obj, lv_event_t event) {                  //event handler for message box "Close" "Calibrate" "Option"
+static void messageBoxHandlerCallback(lv_obj_t * obj, lv_event_t event) {                  //event handler for message box "Close" "Calibrate" "Option"
 
   switch (event) {
     case LV_EVENT_PRESSED:
@@ -2511,7 +2511,7 @@ static void mbox1_handler_cb(lv_obj_t * obj, lv_event_t event) {                
       lv_obj_set_hidden(option_descrip_text, true);            //hide option description text
       lv_obj_set_hidden(calibrate_descrip_text, true);
       lv_obj_set_hidden(close_descrip_text, true);
-      screen_run_on();
+      screenRunOn();
     }
 
     if (txt == "Calibrate") {
@@ -2535,7 +2535,7 @@ static void mbox1_handler_cb(lv_obj_t * obj, lv_event_t event) {                
   }
   /*Etc.*/
 }
-void lv_ex_btnm_1(void) {                                                         //numeric keypad 0-9 enter
+void createButtonMatrix(void) {                                                         //numeric keypad 0-9 enter
 
   static const char * btnm_map[] = {"1", "2", "3", "4", "5", "\n",                  //text for keys on keypad (last field must be a null)
                                     "6", "7", "8", "9", "0", "\n",
@@ -2551,7 +2551,7 @@ void lv_ex_btnm_1(void) {                                                       
 
 
 }
-void target_speed_event_handler(lv_obj_t * obj, lv_event_t event) {               //call back from keypad to enter target speed
+void targetSpeedEventHandler(lv_obj_t * obj, lv_event_t event) {               //call back from keypad to enter target speed
 
   if (event == LV_EVENT_VALUE_CHANGED) {
  //   Serial.println("line 1329");
@@ -2620,7 +2620,7 @@ void target_speed_event_handler(lv_obj_t * obj, lv_event_t event) {             
   }
   Serial.println("line 1462");
 }
-static void btn_set_cal_cb(lv_obj_t * obj, lv_event_t event) {                    //callback for "set with keypad" button in calibration screen
+static void btnSetCalibrationCallback(lv_obj_t * obj, lv_event_t event) {                    //callback for "set with keypad" button in calibration screen
 
 
   switch (event) {
@@ -2655,14 +2655,14 @@ static void btn_set_cal_cb(lv_obj_t * obj, lv_event_t event) {                  
       btn5_plus = lv_btn_create(lv_scr_act(), NULL);                  /*+ button for 1st column*/
       lv_obj_set_pos(btn5_plus, 10, 200);                           /*Set its position*/
       lv_obj_set_size(btn5_plus, button_w, button_h);                          /*Set its size*/
-      lv_obj_set_event_cb(btn5_plus, cal_set_cb);                    //callback routine
+      lv_obj_set_event_cb(btn5_plus, calSetCallback);                    //callback routine
       label5P = lv_label_create(btn5_plus, NULL);                      /*Add a label to the button*/
       lv_label_set_text(label5P, " +");                             /*Set the labels text*/
 
       btn5_minus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn5_minus, 10, 260);                           /*Set its position*/
       lv_obj_set_size(btn5_minus, button_w, button_h);               /*Set its size*/
-      lv_obj_set_event_cb(btn5_minus, cal_set_cb);                   //callback routine
+      lv_obj_set_event_cb(btn5_minus, calSetCallback);                   //callback routine
       label5M = lv_label_create(btn5_minus, NULL);                     /*Add a label to the button*/
       lv_label_set_text(label5M, " -");                              /*Set the labels text*/
 
@@ -2670,70 +2670,70 @@ static void btn_set_cal_cb(lv_obj_t * obj, lv_event_t event) {                  
       btn4_plus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn4_plus, 90, 200);                           /*Set its position*/
       lv_obj_set_size(btn4_plus, button_w, button_h);               /*Set its size*/
-      lv_obj_set_event_cb(btn4_plus, cal_set_cb);                   //callback routine
+      lv_obj_set_event_cb(btn4_plus, calSetCallback);                   //callback routine
       label4P = lv_label_create(btn4_plus, NULL);                     /*Add a label to the button*/
       lv_label_set_text(label4P, " +");                             /*Set the labels text*/
 
       btn4_minus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn4_minus, 90, 260);                           /*Set its position*/
       lv_obj_set_size(btn4_minus, button_w, button_h);               /*Set its size*/
-      lv_obj_set_event_cb(btn4_minus, cal_set_cb);                   //callback routine
+      lv_obj_set_event_cb(btn4_minus, calSetCallback);                   //callback routine
       label4M = lv_label_create(btn4_minus, NULL);                     /*Add a label to the button*/
       lv_label_set_text(label4M, " -");                              /*Set the labels text*/
 
       btn3_plus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn3_plus, 170, 200);                           /*Set its position*/
       lv_obj_set_size(btn3_plus, button_w, button_h);                /*Set its size*/
-      lv_obj_set_event_cb(btn3_plus, cal_set_cb);                    //callback routine
+      lv_obj_set_event_cb(btn3_plus, calSetCallback);                    //callback routine
       label3P = lv_label_create(btn3_plus, NULL);                      /*Add a label to the button*/
       lv_label_set_text(label3P, " +");                                 /*Set the labels text*/
 
       btn3_minus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn3_minus, 170, 260);                           /*Set its position*/
       lv_obj_set_size(btn3_minus, button_w, button_h);                /*Set its size*/
-      lv_obj_set_event_cb(btn3_minus, cal_set_cb);                     //callback routine
+      lv_obj_set_event_cb(btn3_minus, calSetCallback);                     //callback routine
       label3M = lv_label_create(btn3_minus, NULL);                       /*Add a label to the button*/
       lv_label_set_text(label3M, " -");                                 /*Set the labels text*/
 
       btn2_plus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn2_plus, 250, 200);                           /*Set its position*/
       lv_obj_set_size(btn2_plus, button_w, button_h);                /*Set its size*/
-      lv_obj_set_event_cb(btn2_plus, cal_set_cb);                    //callback routine
+      lv_obj_set_event_cb(btn2_plus, calSetCallback);                    //callback routine
       label2P = lv_label_create(btn2_plus, NULL);                       /*Add a label to the button*/
       lv_label_set_text(label2P, " +");                              /*Set the labels text*/
 
       btn2_minus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn2_minus, 250, 260);                           /*Set its position*/
       lv_obj_set_size(btn2_minus, button_w, button_h);                /*Set its size*/
-      lv_obj_set_event_cb(btn2_minus, cal_set_cb);                   //callback routine
+      lv_obj_set_event_cb(btn2_minus, calSetCallback);                   //callback routine
       label2M = lv_label_create(btn2_minus, NULL);                    /*Add a label to the button*/
       lv_label_set_text(label2M, " -");                             /*Set the labels text*/
 
       btn1_plus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn1_plus, 330, 200);                           /*Set its position*/
       lv_obj_set_size(btn1_plus, button_w, button_h);                /*Set its size*/
-      lv_obj_set_event_cb(btn1_plus, cal_set_cb);                    //callback routine
+      lv_obj_set_event_cb(btn1_plus, calSetCallback);                    //callback routine
       label1P = lv_label_create(btn1_plus, NULL);                      /*Add a label to the button*/
       lv_label_set_text(label1P, " +");                              /*Set the labels text*/
 
       btn1_minus = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn1_minus, 330, 260);                           /*Set its position*/
       lv_obj_set_size(btn1_minus, button_w, button_h);               /*Set its size*/
-      lv_obj_set_event_cb(btn1_minus, cal_set_cb);                   //callback routine
+      lv_obj_set_event_cb(btn1_minus, calSetCallback);                   //callback routine
       label1M = lv_label_create(btn1_minus, NULL);                      /*Add a label to the button*/
       lv_label_set_text(label1M, " -");                              /*Set the labels text*/
 
       btn0_save = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn0_save, 410, 200);                           /*Set its position*/
       lv_obj_set_size(btn0_save, button_w, button_h);                /*Set its size*/
-      lv_obj_set_event_cb(btn0_save, cal_set_cb);                    //callback routine
+      lv_obj_set_event_cb(btn0_save, calSetCallback);                    //callback routine
       label_save = lv_label_create(btn0_save, NULL);                 /*Add a label to the button*/
       lv_label_set_text(label_save, "Save");                         /*Set the labels text*/
 
       btn0_abort = lv_btn_create(lv_scr_act(), NULL);
       lv_obj_set_pos(btn0_abort, 410, 260);                           /*Set its position*/
       lv_obj_set_size(btn0_abort, button_w, button_h);               /*Set its size*/
-      lv_obj_set_event_cb(btn0_abort, cal_set_cb);                   //callback routine
+      lv_obj_set_event_cb(btn0_abort, calSetCallback);                   //callback routine
       label_abort = lv_label_create(btn0_abort, NULL);               /*Add a label to the button*/
       lv_label_set_text(label_abort, LV_SYMBOL_CLOSE);               /*Set the labels text*/
 
@@ -2743,7 +2743,7 @@ static void btn_set_cal_cb(lv_obj_t * obj, lv_event_t event) {                  
 
   }
 }
-static void cal_set_cb(lv_obj_t * btn, lv_event_t event) {                        //calibration keypad callback routine
+static void calSetCallback(lv_obj_t * btn, lv_event_t event) {                        //calibration keypad callback routine
 
   switch (event) {
     case LV_EVENT_PRESSED:
@@ -2832,7 +2832,7 @@ static void cal_set_cb(lv_obj_t * btn, lv_event_t event) {                      
         if (old_cal_number != cal_number)                                    //new cal number?
         { EEPROM.put(0x05, cal_number);                                  //save calibrtion value to eeprom if changed
           EEPROM.commit();
-          calculate_speed_constant();                                    //calculate new speed constant
+          calculateSpeedConstant();                                    //calculate new speed constant
         }
 
         screen_calibrate_on();                                              //return to calibration screen
@@ -2859,18 +2859,18 @@ static void cal_set_cb(lv_obj_t * btn, lv_event_t event) {                      
       lv_label_set_text(label_cal, text_buff);                                //display text
   }
 }
-static void btn_target_exit_cb(lv_obj_t * btn, lv_event_t event) {
+static void btnTargetExitCallback(lv_obj_t * btn, lv_event_t event) {
   if (event == LV_EVENT_CLICKED) {
-    screen_target_off();
+    screenTargetOff();
     option_screen_on();
-    Serial.println("line 1662 btn_target_exit_cb");
+    Serial.println("line 1662 btnTargetExitCallback");
   }
 }
-static void cal_btn_exit_cb(lv_obj_t * obj, lv_event_t event) {                   //exit the calibration screen
+static void calBtnExitCallback(lv_obj_t * obj, lv_event_t event) {                   //exit the calibration screen
 
   switch (event) {
     case LV_EVENT_PRESSED:                                                    //if exit button is pressed
-      screen_run_on();                                                      //go back to run screen
+      screenRunOn();                                                      //go back to run screen
       break;
     case LV_EVENT_SHORT_CLICKED:
       //Serial.println("Short clicked\n");
@@ -2897,19 +2897,19 @@ static void cal_btn_exit_cb(lv_obj_t * obj, lv_event_t event) {                 
 
   /*Etc.*/
 }
-static void my_start_btn_cb(lv_obj_t * obj, lv_event_t event) {                   //call back for setup button in upper left corner of screen
+static void startButtonCallback(lv_obj_t * obj, lv_event_t event) {                   //call back for setup button in upper left corner of screen
 
   switch (event) {
     case LV_EVENT_PRESSED:
-   //   Serial.println("Event- my_start_btn_cb - line 983");
+   //   Serial.println("Event- startButtonCallback - line 983");
       //lv_obj_set_hidden(btn_setup,true);
       //   lv_obj_set_hidden(title_label_scr_run,true);       //hide the run screen lable
       if (security == 1) {
-        screen_run_off();                           //turn off run screen objects
-        lv_security_code();                        //call password routine
+        screenRunOff();                           //turn off run screen objects
+        displaySecurityCode();                        //call password routine
       }
       else {
-        lv_ex_mbox_1();                                 //show 3 button popup calibrate,options,close
+        createMessageBox();                                 //show 3 button popup calibrate,options,close
       }
       break;
 
@@ -2922,10 +2922,10 @@ static void my_start_btn_cb(lv_obj_t * obj, lv_event_t event) {                 
 
   /*Etc.*/
 }
-static void unit_event_cb(lv_obj_t * obj, lv_event_t event) {                     //cb for checkboxes on option screen
+static void unitEventCallback(lv_obj_t * obj, lv_event_t event) {                     //cb for checkboxes on option screen
   switch (event) {
     case LV_EVENT_VALUE_CHANGED:
-  //    Serial.println("unit_event_cb - line 1148");
+  //    Serial.println("unitEventCallback - line 1148");
       if (obj == cb_kph) {                                          //code to toggle between mph and kph
         lv_cb_set_checked(cb_mph, false);
         lv_cb_set_checked(cb_kph, true);
@@ -3045,10 +3045,10 @@ static void unit_event_cb(lv_obj_t * obj, lv_event_t event) {                   
       if (obj == btn_set_exit) {
         Serial.printf("security =%d,graph =%d,distance =%d,speed_input =%d**************\n", security, graph, dis,speed_input);
        if (speed_input == 0){
-          enable_radar();                                                     //turn off serial2 and turn on pulse interrupt
+          enableRadar();                                                     //turn off serial2 and turn on pulse interrupt
           }
        else{
-          enable_gps();                                                     //turn on serial2 and turn off pulse interrupt                                              
+          enableGPS();                                                     //turn on serial2 and turn off pulse interrupt                                              
     }
         
         if (obj != NULL) {
@@ -3061,22 +3061,22 @@ static void unit_event_cb(lv_obj_t * obj, lv_event_t event) {                   
           EEPROM.put(speed_avg_ee_adr,speed_avg);                              //save stautus of speed average checkbox
           EEPROM.put(speed_input_ee_adr,speed_input);                          //save checkbox status of speed input
           EEPROM.commit();                                                     //write values to eeprom
-          option_screen_off();                                                 //turn off all objects of option screen
+          optionScreenOff();                                                 //turn off all objects of option screen
           pulse = 0;                                                             //reset the pulse counter
           old_millis = millis();                                                //reset the timer
-          screen_run_on();                                                        //return to run screen
+          screenRunOn();                                                        //return to run screen
         }
 
       }
 
       break;
   }
-  Serial.println("line 2480 leaving unit_event_cb()");
+  Serial.println("line 2480 leaving unitEventCallback()");
 }
 /*************************
     TouchPad read routine
  ************************/
-bool my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data) {                 //read touch pad function
+bool inputRead(lv_indev_drv_t * drv, lv_indev_data_t*data) {                 //read touch pad function
   uint16_t t_x = 0, t_y = 0;
   static int16_t last_x = 0;
   static int16_t last_y = 0;
@@ -3102,7 +3102,7 @@ bool my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data) {                
 
 //==================================
 /* Display flushing */
-void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
+void displayFlush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p) {
 
   uint16_t c;
 
@@ -3120,12 +3120,12 @@ void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color
 }
 
 /* Interrupt driven periodic handler */
-static void lv_tick_handler(void)
+static void tickHandler(void)
 {
   lv_tick_inc(LVGL_TICK_PERIOD);
 }
 
-void touch_calibrate()
+void touchCalibrate()
 {
   uint16_t calData[5];
   uint8_t calDataOK = 0;
