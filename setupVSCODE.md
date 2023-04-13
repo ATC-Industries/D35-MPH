@@ -1,8 +1,10 @@
+# Step by Step instructions to setup Visual Studio Code and PlatformIO
+
 Here are the step-by-step instructions to help your boss set up their system with Visual Studio Code and PlatformIO to build and upload the code from your GitHub repository to the target hardware.
 
 ## Step 1: Install Visual Studio Code (VSCode)
 
-- Visit the official Visual Studio Code website at https://code.visualstudio.com/.
+- Visit the official Visual Studio Code website at <https://code.visualstudio.com/>.
 - Download the appropriate installer for your boss's operating system (Windows, macOS, or Linux).
 - Run the installer and follow the installation prompts to complete the installation.
 
@@ -16,7 +18,7 @@ Here are the step-by-step instructions to help your boss set up their system wit
 
 ## Step 3: Clone the GitHub repository
 
-- Install Git on the computer if it's not already installed (download from https://git-scm.com/downloads).
+- Install Git on the computer if it's not already installed (download from <https://git-scm.com/downloads>).
 - Open a terminal/command prompt on the computer.
 - Navigate to the folder where your boss wants to store the project (e.g., cd /path/to/projects/folder).
 - Clone the GitHub repository using the following command:
@@ -24,6 +26,7 @@ Here are the step-by-step instructions to help your boss set up their system wit
 ```bash
 git clone https://github.com/ATC-Industries/D35-MPH.git
 ```
+
 - Wait for the cloning process to complete.
 
 ## Step 4: Open the project in VSCode
@@ -51,5 +54,4 @@ Make sure the device drivers are installed if necessary (refer to the hardware d
 - Click on "Build" to compile the code. Wait for the compilation process to complete, and make sure there are no errors.
 - Click on "Upload" to upload the compiled code to the target hardware. Wait for the upload process to complete.
 
-
-By following these instructions, your boss should be able to set up their system with Visual Studio Code and PlatformIO, clone your GitHub repository, and build and upload the code to the target hardware. If there are any issues, make sure to check the PlatformIO documentation (https://docs.platformio.org/en/latest/) and the hardware documentation for additional guidance.
+By following these instructions, your boss should be able to set up their system with Visual Studio Code and PlatformIO, clone your GitHub repository, and build and upload the code to the target hardware. If there are any issues, make sure to check the PlatformIO documentation (<https://docs.platformio.org/en/latest/>) and the hardware documentation for additional guidance.

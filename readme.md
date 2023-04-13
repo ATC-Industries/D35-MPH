@@ -2,6 +2,7 @@
 
 VERY IMPORTANT
 You MUST replace the `User_Setup.h` file in the TFT_eSPI (`.pio/libdeps/esp-wrover-kit/TFT_eSPI`) library with the one in the D35 MPH Monitor folder.  This is the only way to get the display to work. You should copy the file from the D35 folder don't move it. If your library ever updates it will Override this file. As of right now this is the only solution that works.
+
 1. Locate the `TFT_eSPI` library folder in your project (`.pio/libdeps/esp-wrover-kit/TFT_eSPI`).
 2. Locate the `User_Setup.h` file in the D35 MPH Monitor folder.
 3. Copy the `User_Setup.h` file from the D35 MPH Monitor folder.
@@ -10,6 +11,7 @@ You MUST replace the `User_Setup.h` file in the TFT_eSPI (`.pio/libdeps/esp-wrov
 Please note that if the `TFT_eSPI` library updates in the future, it may overwrite the custom `User_Setup.h` file. In that case, you will need to replace it again with the provided file from the D35 MPH Monitor folder.
 
 ## Note on conversions and calculating speed
+
 | Conversion Formula | Formula |
 |--------------------|---------|
 | Convert Knots to MPH | knots * 1.15078 = mph |
@@ -17,69 +19,76 @@ Please note that if the `TFT_eSPI` library updates in the future, it may overwri
 | Convert MPH to KPH | mph * 1.60934 = kph |
 | Speed Calculation | Software counts the pulses on an interrupt for 500ms and then calculates speed |
 
-
  mph = pulses detected in one second / (pulses output in a mile/3600)  note pulses output in a mile is the output of the speed device
 pulses inlimi300 ft times 17.6 = pulses in a mile
 
-
 (set software version on line 182)
 
-# Changelog
+## Changelog
 
 This is a record of changes made to the software.
 
-## Version 10
+### Version 10
+
 - Added field calibration.
 
-## Version 11
+### Version 11
+
 - Added distance counter.
 - Added reset button for distance.
 
-## Version 22
+### Version 22
+
 - Added averaging routine to speed calculation.
 - Do not display decimal on speeds over 30.
 - Removed 'if' code from pulse interrupt routine that was causing pulses to reset to zero sometimes.
 
-## Version 23TP
+### Version 23TP
+
 - For tractor puller application.
 - Deleted the distance measuring mode.
 - Show .1 mph increments for all speeds under 50mph.
 
-## Version 24TP
+### Version 24TP
+
 - Changed the algorithm that captures pulses from the speed device (old system was not accurate enough).
 - Went to positive edge on interrupt trigger to prevent false trips we were getting on negative edge trips of speed input line.
 - Changed to 250ms speed updates for quicker response time.
 - Made speed average an option on the option screen.
 - Added speed average checkbox to option screen.
 
-## Version 25TP
+### Version 25TP
+
 - Changed 250ms interrupt clock to reset to zero on start of first pulse.
 - Added software version number in upper left corner of "Option Screen".
 
-## Version 1.26
+### Version 1.26
+
 - Fixed problem of instruction text staying on screen when leaving field calibration mode.
 
-## Version 1.27
+### Version 1.27
+
 - Added checkboxes to option screen for radar or gps input.
 - Added code to read GPS on serial port "Serial2" //Serial2.begin(19200,SERIAL_8N1,25,22) 25-rx 22-tx.
 - Moved radar input from pin 33 to pin 25 that is shared with rs232 input.
 
-## Version 1.28
+### Version 1.28
+
 - Added pulsing alarm light that flashes faster as you near target.
 - Created a 100ms timer with interrupt routine to flash alarm light.
 
-
 ## GPS Sensor
 
-To output the RMC string from the GPS sensor, send the following code: 
+To output the RMC string from the GPS sensor, send the following code:
 
-```
+```serial
 $ /P /G /R /M /O /' /G /P /R /M /C /' /1/cr/lf
 24/50/47/52/4D/4F/2C/47/50/52/4D/43/2C/31/0D/0A
 ```
 
 Below is an example of the GPRMC string that the software decodes:
-```
+
+```serial
 GPRMC,154030.4,A,3935.76900,N,08610.28625,W,000.02,240.3,171020,004.5,W*0.05C
 ```
 
@@ -97,7 +106,7 @@ GPRMC,154030.4,A,3935.76900,N,08610.28625,W,000.02,240.3,171020,004.5,W*0.05C
 - 11: Magnetic variation direction
 - 12: Positioning system mode indicator
 - 13: Checksum
-- 14: [CR][LF] Sentence terminator
+- 14: \[CR\]\[LF\] Sentence terminator
 
 ## Hardware
 
@@ -125,9 +134,11 @@ The 320 x 480 red board with a 14-pin header has a resistive touch with a touch 
 ## Fonts
 
 Custom fonts used in the project should be defined in `lv_conf.h` (line 274).
+
 ```c++
 #define LV_FONT_CUSTOM_DECLARE  LV_FONT_DECLARE(Bebasneue)
 ```
+
 Fonts must be built using LittlevGL font converter program. The `Bebasneue` font was converted with LittlevGL font converter and used as the large speed font. Fonts must be saved in the LittlevGL "font" directory.
 
 ## User_Setup.h
