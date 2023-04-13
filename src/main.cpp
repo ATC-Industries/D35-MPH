@@ -358,29 +358,33 @@ void setAlarmLight(bool state) {
   digitalWrite(alarm_light, state);
 }
 
-void create_title_line(void) {
+void createTitleLine() {
+  static lv_point_t line_points1[] = {{2, 22}, {480, 22}};
+  static lv_point_t line_points2[] = {{2, 235}, {480, 235}};
+  static lv_style_t style_line;
 
-  static lv_point_t line_points[] = { {2, 22}, {480, 22}};              /*Create an array for the points of the line*/
-  static lv_style_t style_line;                                        /*Create new style (thick dark blue)*/
-  lv_style_copy(&style_line, &lv_style_plain);
-  style_line.line.color = LV_COLOR_MAKE(0x00, 0x3b, 0x75);              //set the color of the line to dark blue
-  style_line.line.width = 6;                                            //line width in pixels
-  style_line.line.rounded = 1;                                          //pixel radius of ends
-
-
-  line1 = lv_line_create(lv_scr_act(), NULL);
-  lv_line_set_points(line1, line_points, 2);                              /*Identify the 2 points  declared in the array*/
-  lv_line_set_style(line1, LV_LINE_STYLE_MAIN, &style_line);             //apply a style to the line
-  lv_obj_align(line1, NULL, LV_ALIGN_CENTER, 0, -130);                   //set position of line
-  lv_obj_set_hidden(line1, true);                                        //hide the line after creating
-
-  static lv_point_t line_points2[] = { {2, 235}, {480, 235}};            //endpoints of line
-  line2 = lv_line_create(lv_scr_act(), NULL);                            //create an object
-  lv_line_set_points(line2, line_points2, 2);                            /*Identify the 2 points  declared in the array*/
-  lv_line_set_style(line2, LV_LINE_STYLE_MAIN, &style_line);             //apply a style to the line
-  lv_obj_set_hidden(line2, true);                                        //hide the line
-
+  initializeLineStyle(style_line);
+  line1 = createLineWithStyle(line_points1, 2, &style_line, 0, -130);
+  line2 = createLineWithStyle(line_points2, 2, &style_line, 0, 0);
 }
+
+void initializeLineStyle(lv_style_t &style_line) {
+  lv_style_copy(&style_line, &lv_style_plain);
+  style_line.line.color = LV_COLOR_MAKE(0x00, 0x3b, 0x75);
+  style_line.line.width = 6;
+  style_line.line.rounded = 1;
+}
+
+lv_obj_t* createLineWithStyle(const lv_point_t *points, uint16_t point_count, lv_style_t *style, int16_t align_x, int16_t align_y) {
+  lv_obj_t *line = lv_line_create(lv_scr_act(), NULL);
+  lv_line_set_points(line, points, point_count);
+  lv_line_set_style(line, LV_LINE_STYLE_MAIN, style);
+  lv_obj_align(line, NULL, LV_ALIGN_CENTER, align_x, align_y);
+  lv_obj_set_hidden(line, true);
+
+  return line;
+}
+
 
 //FUNCTION STUBS
 void my_disp_flush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p);
@@ -567,7 +571,7 @@ void setup() {
     enable_gps();                                                     //turn on serial2 and turn off pulse interrupt                                              
     }
  
-  create_title_line();                                                 //create screen seperator lines
+  createTitleLine();                                                 //create screen seperator lines
   build_screen_run();                                                  //build the different screens
   build_option_screen();                                               //set program options
   build_screen_target();                                               //set target speed for center of bar graph
