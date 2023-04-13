@@ -1,5 +1,8 @@
 # D35 MPH Monitor
 
+VERY IMPORTANT
+You MUST replace the User_Setup.h file in the TFT_eSPI library with the one in the D35 MPH Monitor folder.  This is the only way to get the display to work. You should copy the file from the D35 folder don't move it. If your library ever updates it will Override this file. As of right now this is the only solution that works.
+
 ## Note on conversions and calculating speed
 | Conversion Formula | Formula |
 |--------------------|---------|
