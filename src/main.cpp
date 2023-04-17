@@ -27,50 +27,46 @@ constexpr int EEPROM_SIZE = 512;
 // LittlevGL tick period definition
 constexpr int LVGL_TICK_PERIOD = 20;
 
-/**********************
-    Define Colors
- **********************/
-#define BLACK 0x0000                //declare constants for colors
-#define NAVY 0x000F
-#define DARKGREEN 0x03E0
-#define DARKCYAN 0x03EF
-#define MAROON 0x7800
-#define PURPLE 0x780F
-#define OLIVE 0x7BE0
-#define LIGHTGREY 0xC618
-#define DARKGREY 0x7BEF
-#define BLUE 0x001F
-#define GREEN 0x07E0
-#define CYAN 0x07FF
-#define RED 0xF800
-#define MAGENTA 0xF81F
-#define YELLOW 0xFFE0
-#define WHITE 0xFFFF
-#define ORANGE 0xFD20
-#define GREENYELLOW 0xAFE5
-#define PINK 0xF81F
+// Define Colors
+constexpr uint16_t BLACK = 0x0000;
+constexpr uint16_t NAVY = 0x000F;
+constexpr uint16_t DARKGREEN = 0x03E0;
+constexpr uint16_t DARKCYAN = 0x03EF;
+constexpr uint16_t MAROON = 0x7800;
+constexpr uint16_t PURPLE = 0x780F;
+constexpr uint16_t OLIVE = 0x7BE0;
+constexpr uint16_t LIGHTGREY = 0xC618;
+constexpr uint16_t DARKGREY = 0x7BEF;
+constexpr uint16_t BLUE = 0x001F;
+constexpr uint16_t GREEN = 0x07E0;
+constexpr uint16_t CYAN = 0x07FF;
+constexpr uint16_t RED = 0xF800;
+constexpr uint16_t MAGENTA = 0xF81F;
+constexpr uint16_t YELLOW = 0xFFE0;
+constexpr uint16_t WHITE = 0xFFFF;
+constexpr uint16_t ORANGE = 0xFD20;
+constexpr uint16_t GREENYELLOW = 0xAFE5;
+constexpr uint16_t PINK = 0xF81F;
 
-/*********************
-   EEPROM varibles
- *********************/
-//EEprom address values
-#define unit_ee_adr 1                              //location 1, 0= mph 1= kph 2= dis 3= mpm
-#define guage_ee_adr 2                             //location 2, 0 = digital readout, 1 = analog meter readout 2= bar graph
-#define cal_ee_edr 5                               //calibration number (float number
-#define security_ee_adr 10                         //Enable Security check box
-#define graph_ee_adr 11                            //status of enable bar graph check box 
-#define dis_ee_adr 12                              //distance checkbox status
-#define alarm_ee_adr 13                           //alarm status
-#define speed_target_ee_adr 15                     //target speed (float number)    
-#define fpm_ee_adr 21                              //feet per minute checkbox
-#define upw_ee_adr 25                              //user password code  
-#define speed_avg_ee_adr 29                        //speed average checkbox status
-#define screen_cal_ee_adr 35                       //set to 0 to force screen calibration and 1 to prevent screen calibration
-#define speed_input_ee_adr 40                      //0= radar or wheelpulse  input, 1 = gps input
-#define ALR1_ee_adr 45                             //alarm 1 value
-#define ALR2_ee_adr 50                             //alarm 2 value
-#define ALR3_ee_adr 55                             //alarm 3 value
-#define ALR4_ee_adr 60                             //alarm 4 value
+// EEPROM Variables and Addresses
+constexpr int UNIT_EE_ADR = 1;          // Location 1, 0= mph 1= kph 2= dis 3= mpm
+constexpr int GAUGE_EE_ADR = 2;         // Location 2, 0 = digital readout, 1 = analog meter readout 2= bar graph
+constexpr int CAL_EE_ADR = 5;           // Calibration number (float number)
+constexpr int SECURITY_EE_ADR = 10;     // Enable Security check box
+constexpr int GRAPH_EE_ADR = 11;        // Status of enable bar graph check box
+constexpr int DIS_EE_ADR = 12;          // Distance checkbox status
+constexpr int ALARM_EE_ADR = 13;        // Alarm status
+constexpr int SPEED_TARGET_EE_ADR = 15; // Target speed (float number)
+constexpr int FPM_EE_ADR = 21;          // Feet per minute checkbox
+constexpr int UPW_EE_ADR = 25;          // User password code
+constexpr int SPEED_AVG_EE_ADR = 29;    // Speed average checkbox status
+constexpr int SCREEN_CAL_EE_ADR = 35;   // Set to 0 to force screen calibration and 1 to prevent screen calibration
+constexpr int SPEED_INPUT_EE_ADR = 40;  // 0= radar or wheel pulse input, 1 = GPS input
+constexpr int ALR1_EE_ADR = 45;         // Alarm 1 value
+constexpr int ALR2_EE_ADR = 50;         // Alarm 2 value
+constexpr int ALR3_EE_ADR = 55;         // Alarm 3 value
+constexpr int ALR4_EE_ADR = 60;         // Alarm 4 value
+
 /**********************
     Graphics engine parameters
  **********************/
@@ -940,7 +936,7 @@ void set_alarm_cb(lv_obj_t * obj, lv_event_t event){                 //callback 
               }
               else{
                 speed_target = ALR1;                                  //set target speed to alarm 1 value if not in setup mode
-                EEPROM.put(speed_target_ee_adr,speed_target);
+                EEPROM.put(SPEED_TARGET_EE_ADR,speed_target);
                 EEPROM.commit();
                  alarm_set_off();                                     //turn off 5 buttons
               }
@@ -956,7 +952,7 @@ void set_alarm_cb(lv_obj_t * obj, lv_event_t event){                 //callback 
             }
             else{
              speed_target = ALR2;
-              EEPROM.put(speed_target_ee_adr,speed_target);
+              EEPROM.put(SPEED_TARGET_EE_ADR,speed_target);
                EEPROM.commit(); 
               alarm_set_off();                                    //turn off 5 buttons
             }
@@ -972,7 +968,7 @@ void set_alarm_cb(lv_obj_t * obj, lv_event_t event){                 //callback 
             }
             else{
               speed_target = ALR3;
-               EEPROM.put(speed_target_ee_adr,speed_target);
+               EEPROM.put(SPEED_TARGET_EE_ADR,speed_target);
                EEPROM.commit();
                alarm_set_off();                                   //turn off 5 buttons
             }
@@ -988,7 +984,7 @@ void set_alarm_cb(lv_obj_t * obj, lv_event_t event){                 //callback 
               }
               else{
                 speed_target = ALR4;
-               EEPROM.put(speed_target_ee_adr,speed_target);
+               EEPROM.put(SPEED_TARGET_EE_ADR,speed_target);
                EEPROM.commit();
                  alarm_set_off();                                //turn off 5 buttons
               }
@@ -998,10 +994,10 @@ void set_alarm_cb(lv_obj_t * obj, lv_event_t event){                 //callback 
         alarm_set_off();                                         //turn off 5 buttons
          lv_label_set_text(label_cal, "");                       //erase large text letters
          
-        EEPROM.put(ALR1_ee_adr, ALR1);                             //save alarm values to eeprom 
-        EEPROM.put(ALR2_ee_adr, ALR2);
-        EEPROM.put(ALR3_ee_adr, ALR3);
-        EEPROM.put(ALR4_ee_adr, ALR4);
+        EEPROM.put(ALR1_EE_ADR, ALR1);                             //save alarm values to eeprom 
+        EEPROM.put(ALR2_EE_ADR, ALR2);
+        EEPROM.put(ALR3_EE_ADR, ALR3);
+        EEPROM.put(ALR4_EE_ADR, ALR4);
         EEPROM.commit();                                           //only writes if value has changed
         hold_text = "";                                            //erase display text buffer
        if(alarm_entry_flag == false){                             //if not in alarm entry mode
@@ -1160,7 +1156,7 @@ void new_pw_event_handler(lv_obj_t * obj, lv_event_t event) {        //event han
         if (String(temp_buff).length() >= 3) {                           //must be at least 2 digits length plus the 'E'
           user_passcode =  String(temp_buff);                          //set passcode to new value
           int xvar = user_passcode.toInt();
-          EEPROM.put(upw_ee_adr, xvar);                                 //save new user password to eeprom as integer value
+          EEPROM.put(UPW_EE_ADR, xvar);                                 //save new user password to eeprom as integer value
           EEPROM.commit();
           printf("%d is the new password **********\n", user_passcode.toInt());     //***diagnostic code
           screen_run_off();                                            //turn off objects used from run screen
@@ -2735,14 +2731,14 @@ static void option_screen_cb(lv_obj_t * obj, lv_event_t event) {                
     }
         
         if (obj != NULL) {
-          EEPROM.put(unit_ee_adr, units);                                         ///save units ( 2 kph or 1 mph)
+          EEPROM.put(UNIT_EE_ADR, units);                                         ///save units ( 2 kph or 1 mph)
           EEPROM.put(10, security);                                                   //save setting to eeprom
           EEPROM.put(11, graph);
           EEPROM.put(12, dis);
-          EEPROM.put(fpm_ee_adr, fpm);
-          EEPROM.put(alarm_ee_adr, alarm_enable);
-          EEPROM.put(speed_avg_ee_adr,speed_avg);                              //save stautus of speed average checkbox
-          EEPROM.put(speed_input_ee_adr,speed_input);                          //save checkbox status of speed input
+          EEPROM.put(FPM_EE_ADR, fpm);
+          EEPROM.put(ALARM_EE_ADR, alarm_enable);
+          EEPROM.put(SPEED_AVG_EE_ADR,speed_avg);                              //save stautus of speed average checkbox
+          EEPROM.put(SPEED_INPUT_EE_ADR,speed_input);                          //save checkbox status of speed input
           EEPROM.commit();                                                     //write values to eeprom
           option_screen_off();                                                 //turn off all objects of option screen
           pulse = 0;                                                             //reset the pulse counter
@@ -2869,7 +2865,7 @@ void touch_calibrate()
       f.write((const unsigned char *)calData, 14);                             //save the calibration data to spiffs
       f.close();                                                               //close the file
     var_REPEAT_CAL = 55;                                                       //set to 55 to indicate touch routine has been performed
-    EEPROM.put(screen_cal_ee_adr,var_REPEAT_CAL);
+    EEPROM.put(SCREEN_CAL_EE_ADR,var_REPEAT_CAL);
     EEPROM.commit();                                                           //commit to eeprom
     }
   }
@@ -3023,29 +3019,29 @@ void setup() {
   /**********************
       load varibles from eeprom
    **********************/
-  EEPROM.get(security_ee_adr, security);                        //Enable Security check box
-  EEPROM.get(graph_ee_adr, graph);                              //status of enable bar graph check box
-  EEPROM.get(dis_ee_adr, dis);                                  //status enable distance check box
-  EEPROM.get(speed_target_ee_adr, speed_target);                //speed target for bar graph float number
-  EEPROM.get(cal_ee_edr, cal_number);                           //get calibration number from eeprom
+  EEPROM.get(SECURITY_EE_ADR, security);                        //Enable Security check box
+  EEPROM.get(GRAPH_EE_ADR, graph);                              //status of enable bar graph check box
+  EEPROM.get(DIS_EE_ADR, dis);                                  //status enable distance check box
+  EEPROM.get(SPEED_TARGET_EE_ADR, speed_target);                //speed target for bar graph float number
+  EEPROM.get(CAL_EE_ADR, cal_number);                           //get calibration number from eeprom
   old_cal_number = cal_number;                                  //set varible the same as cal number
-  EEPROM.get(unit_ee_adr, units);                               //get units 1 = MPH  2= KPH
+  EEPROM.get(UNIT_EE_ADR, units);                               //get units 1 = MPH  2= KPH
   calculate_speed_constant();                                   //calculate the constant used for speed calculation
-  EEPROM.get(fpm_ee_adr, fpm);                                  //feet per minute checkbox status
-  EEPROM.get(alarm_ee_adr, alarm_enable);                       //alarm notification 0 = off 1 = on
-  EEPROM.get(speed_avg_ee_adr, speed_avg);                      //status of speed average checkbox
-  EEPROM.get(speed_input_ee_adr, speed_input);                  //0= radar 1= gps
-  EEPROM.get(screen_cal_ee_adr,var_REPEAT_CAL);
-  EEPROM.get(ALR1_ee_adr,ALR1);                                //get alarm1 value
+  EEPROM.get(FPM_EE_ADR, fpm);                                  //feet per minute checkbox status
+  EEPROM.get(ALARM_EE_ADR, alarm_enable);                       //alarm notification 0 = off 1 = on
+  EEPROM.get(SPEED_AVG_EE_ADR, speed_avg);                      //status of speed average checkbox
+  EEPROM.get(SPEED_INPUT_EE_ADR, speed_input);                  //0= radar 1= gps
+  EEPROM.get(SCREEN_CAL_EE_ADR,var_REPEAT_CAL);
+  EEPROM.get(ALR1_EE_ADR,ALR1);                                //get alarm1 value
   if (ALR1 >99.9){                                            //set to zero if over 99.9
     ALR1 = 1.0;  }
-  EEPROM.get(ALR2_ee_adr,ALR2);                                //get alarm1 value
+  EEPROM.get(ALR2_EE_ADR,ALR2);                                //get alarm1 value
    if (ALR2 >99.9){                                            //set to zero if over 99.9
     ALR2 = 2.0;  }
-  EEPROM.get(ALR3_ee_adr,ALR3);                                //get alarm1 value
+  EEPROM.get(ALR3_EE_ADR,ALR3);                                //get alarm1 value
    if (ALR3 >99.9){                                            //set to zero if over 99.9
     ALR3 = 3.0;  }
-  EEPROM.get(ALR4_ee_adr,ALR4);                                //get alarm1 value
+  EEPROM.get(ALR4_EE_ADR,ALR4);                                //get alarm1 value
    if (ALR4 >99.9){                                            //set to zero if over 99.9
     ALR4 = 4.0;  }
 if (var_REPEAT_CAL == 55){                                    //if screen is calibrated then 55 is saved to eeprom value
@@ -3057,7 +3053,7 @@ if (var_REPEAT_CAL == 55){                                    //if screen is cal
    
   // Calibrate the touch screen and set the scaling factors
   touch_calibrate();    //start the input device
-  EEPROM.get(upw_ee_adr, user_passcode_int);                    //user pass code saved as an integer, converted and used as string in program
+  EEPROM.get(UPW_EE_ADR, user_passcode_int);                    //user pass code saved as an integer, converted and used as string in program
   
   char data_var[8];                                             //create char array to hold value
   sprintf(data_var, "%dE", user_passcode_int);                   //convert to a string
