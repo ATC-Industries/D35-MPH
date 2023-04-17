@@ -88,16 +88,10 @@ void my_print(lv_log_level_t level, const char *file, uint32_t line, const char 
 }
 #endif
 
-
-/**********************
-    STATIC PROTOTYPES
- **********************/
-static void btn_event_cb(lv_obj_t * btn, lv_event_t event);
-static void ddlist_event_cb(lv_obj_t * ddlist, lv_event_t event);
-static lv_obj_t * slider;          //create a slider object
 /**********************
     varibles
  **********************/
+static lv_obj_t * slider;          //create a slider object
 bool REPEAT_CAL ;                           // Set REPEAT_CAL to true instead of false to run calibration
 char software_ver[20] = "Ver 2.1.2";     //$software version
 int pulse_reset;                 //flag to restart timer used for calc speed on start of pulse
