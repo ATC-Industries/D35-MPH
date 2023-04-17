@@ -91,7 +91,6 @@ void my_print(lv_log_level_t level, const char *file, uint32_t line, const char 
 /**********************
     varibles
  **********************/
-static lv_obj_t * slider;          //create a slider object
 bool REPEAT_CAL ;                           // Set REPEAT_CAL to true instead of false to run calibration
 char software_ver[20] = "Ver 2.1.2";     //$software version
 int pulse_reset;                 //flag to restart timer used for calc speed on start of pulse
