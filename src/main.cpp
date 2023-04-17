@@ -1,137 +1,32 @@
+// Enable serial debugging
+#define SERIAL_DEBUG 1
 
-   
-
-/*    Software Ver 2.1.4
- 
- unrem line 634,635,636 to force a screen calibration on unit that has already been calibrated.
- 
- File Location C:/Documents/Arduino/ESP32_TFT_eSPI_Littleglrev2
-convert knots to mph                        knots * 1.15078 = mph
-
-convert knots to kph                        knots* 1.852 = kph
-conversion factor to convert mph to kph     mph * 1.60934 = kph
- software counts the pulses  for 500ms and then calculates speed  (pulse input tied to interupt pin)
-
- mph = pulses detected in one second / (pulses output in a mile/3600)  note pulses output in a mile is the output of the speed device
-pulses in limi300 ft times 17.6 = pulses in a mile
-
-
-(set software version on line 208)
-
-ver 10 add field calibration
-VER 11 ADD DISTANCE COUNTER and reset button for distance
-ver 22 Add averaging routine to speed calculation
-       do not display decimal on speeds over 30
-       removed 'if' code from pulse interrupt routine that was causing pulses to reset to zero sometimes
-ver 23TP is for tractor puller application and deletes the distance measuring mode. show .1 mph increments for all speeds under 50mph
-ver 24TP  changed the algorithem that captures pulses from the speed device (old system was not accurate enough)
-            went to positive edge on intterupt trigger to prevent false trips we were getting on negative edge trips of speed input line
-            changed to 250ms speed updates for quicker response time
-            made speed average an option on the option screen
-            added speed average checkbox to option screen
-ver 25TP    changed 250ms interupt clock to reset to zero on start of first pulse
-            added software version number in upper left corner of "Option Screen"
-                        
-ver 1.26    Fixed problem of instruction text staying on screen when leaving field calibration mode.            
-
-ver 1.27    Added checkboxes to option screen for radar or gps input
-            Added code to read GPS on serial port "Serial2" //Serial2.begin(19200,SERIAL_8N1,25,22) 25-rx 22-tx
-            moved radar input from pin 33 to pin 25 that is shared with rs232 input
-ver 2.0.1     Version for Tractor pulling added 4 alarm points to the 1.27 version software
-ver 2.0.2      save current alarm setting value (chosen on 5-key keypad) to eeprom.
-              added second 2x5 keypad for security screen
-              added message box on how to enter alarms on 5 button alarm setting screen
-ver 2.0.3     added OK button to minimum  calibration message box tied to keboard entry of cal number  
-ver 2.0.5     add flashing light routine using hardware timers
-ver 2.0.6     add metric verbage to field cal when in km mode            
-ver 2.0.7     keep alarm check box on in option screen 
-ver 2.0.8     repaired keypad problems in password screens, was pulling in wrong keypad.      
-ver 2.0.9     added text at bottom of screen to show alarm point setting.  
-ver 2.1.0    stable version  
-ver 2.1.1    turn off mph label,alarm bell, and lines when 5 button keypad is shown
-             Made the preset 5 alarm buttons larger 
-ver 2.1.2    In field cal changed message box to say "Begin Driving", was "Begin Driving 300 ft" which was wrong when in metric mode
-             changed 'Press STOP' to 'Press END' in field calibration screen
-ver 2.1.3    Stable version ( 
-ver 2.1.4    added  dividing lines to option screen and moved around optioins to make screen more readable.
-ver 2.1.4   10/27/21 fixed so screen calibration would run from factory service screen 2001
-
-                           
- future changes 1. make metric field cal 100 meters instead of 91.44     
-       
-(software version on line 178)
-*///baud rate 19,200 (default baud rate for 5 hz guns.) 
-//send the following code to the GPS sensor to output the RMC string: (must be done externally, tx line not tied 4 pin connector.
-//     $ /P /G /R /M /O / ' /G/P /R /M /C / ' /1/cr/lf
-//     24/50/47/52/4D/4F/2C/47/50/52/4D/43/2C/31/0D/0A
-//below is the GPRMC string we are decoding
-//NOTE****  The GPS sensor must be programed to output the following string only.
-//prog_char str3[] PROGMEM = "$GPRMC,201548.000,A,3014.5529,N,09749.5808,W,000.17,53.25,040109,,*2B";  //000.17 is speed in knots (7th position)
-
-
-/* Display header pinout  320 X 480 red board with 14 pin header resitive touch with touch controller built on board
-  1 T_IRQ     N/C
-  2 T_DO      19
-  3 T_DIN     23
-  4 T_CS      21
-  5 T_CLK     18
-  6 MISO      N/C    do not use, the display does not tristate this line when CS is deactivated,crashes with touch pad routine
-  7 BACKLIGHT 5V
-  8 SCK       18
-  9 MOSI      23
-  10 DC/RS    15
-  11 RESET    32
-  12 CS       5
-  13 GND
-  14 VCC 3.3V
-  ==================================
-  Define custom fonts used in lv_conf.h (line 274)
-  fonts must be built useing littlevgl font convertor program
-  &Bebasneue font was converted with littlevgl font convertor and used as the large speed font
-  fonts must be saved in littlevgl "font" directory
-
-  Declare io pins in User_Setup.h (line 163-169)
-  Declare fonts used in User_Setup.h (line 228-235)
-  Declare driver chip being used in User_Setup.h  (line 18-33)
-  In User_Setup_Select.h  unrem the line "#include<User_Setup.h>"
-*/
-
-
-#define serial_debug   1            //set to '1'  to show debug lines in serial monitor
-
-/**********************
-    Include files
- **********************/
-#include "FS.h"                     //enable spiff file system on esp 32 (for touch cal data)
-#include "lvgl/lvgl.h"                   //This is the graphics library
-#include <SPI.h>                    // files for spi
-#include <TFT_eSPI.h>               // routines for littlevgl     
-#include <Ticker.h>                 //interupt used with littlVgl graphics engine
+// Include libraries and dependencies
+#include "FS.h"                 // Enable SPIFFS file system on ESP32 (for touch calibration data)
+#include "lvgl/lvgl.h"          // LittlevGL graphics library
+#include <SPI.h>                // SPI library
+#include <TFT_eSPI.h>           // TFT library for LittlevGL
+#include <Ticker.h>             // Interrupt library for LittlevGL graphics engine
 #include <stdio.h>
-
 #include "lv_ex_conf.h"
-#include <EEPROM.h>                 //eeprom utilities
-//#include <NMEAGPS.h>                //include for GPS sensor
-#include"TouchScreen.h"
-//#include "WiFi.h"
-/**********************
-    Define IO pins
- **********************/
-#define YP 12                      //analog pin touch screen
-#define XM 13                      //analog pin touch screen
-#define YM 14                      //digital pin touch screen
-#define XP 27                      //digital pin touch screen
-#define status_light 4             //on board led for diagnostic use
-//-----------------------------
-#define alarm_light 26              //panel LED alarm light
-#define aux_light 27                 //auxillary output line
-//-------------------------------
-//#define alarm_light 27              //panel LED alarm light  (John Gibbs unit with 12 volt led light in panel)
-//#define aux_light 26                 //auxillary output line
-//-------------------------------
-#define EEPROM_SIZE 512              //must declare how many bytes for eeprom
+#include <EEPROM.h>             // EEPROM utilities
+#include "TouchScreen.h"        // Touchscreen library
 
-#define LVGL_TICK_PERIOD 20         //internal timing of graphics module(was 20)
+// Define IO pins
+constexpr int YP = 12;      // Analog pin for touch screen
+constexpr int XM = 13;      // Analog pin for touch screen
+constexpr int YM = 14;      // Digital pin for touch screen
+constexpr int XP = 27;      // Digital pin for touch screen
+constexpr int STATUS_LED = 4;   // On-board LED for diagnostic use
+constexpr int ALARM_LED = 26;   // Panel LED alarm light
+constexpr int AUX_LED = 27;     // Auxiliary LED output line
+
+// EEPROM size definition
+constexpr int EEPROM_SIZE = 512;
+
+// LittlevGL tick period definition
+constexpr int LVGL_TICK_PERIOD = 20;
+
 /**********************
     Define Colors
  **********************/
@@ -471,7 +366,7 @@ void IRAM_ATTR onTimer_cb(){                                              //inte
     
   }
 void IRAM_ATTR flash_timer_cb(){                                      //interrupt routine for 100 ms timer used to flash alarm led
-     digitalWrite(alarm_light,!digitalRead(alarm_light));             //toggle alarm light
+     digitalWrite(ALARM_LED,!digitalRead(ALARM_LED));             //toggle alarm light
      }  
  
 void create_title_line(void) {
@@ -2113,27 +2008,27 @@ void flash_alarm(){                                                             
      
 }
 void test_flash_alarm(void){                                                      //test alarm flash routine
-   digitalWrite(alarm_light,false);                  //turn off aux output
+   digitalWrite(ALARM_LED,false);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,true);                  //turn off aux output
+   digitalWrite(ALARM_LED,true);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,false);                  //turn off aux output
+   digitalWrite(ALARM_LED,false);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,true);                  //turn off aux output
+   digitalWrite(ALARM_LED,true);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,false);                  //turn off aux output
+   digitalWrite(ALARM_LED,false);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,true);                  //turn off aux output
+   digitalWrite(ALARM_LED,true);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,false);                  //turn off aux output
+   digitalWrite(ALARM_LED,false);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,true);                  //turn off aux output
+   digitalWrite(ALARM_LED,true);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,false);                  //turn off aux output
+   digitalWrite(ALARM_LED,false);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,true);                  //turn off aux output
+   digitalWrite(ALARM_LED,true);                  //turn off aux output
    delay(150);
-   digitalWrite(alarm_light,false);
+   digitalWrite(ALARM_LED,false);
 }
 void enable_gps(void){                                                            //enable gps function
      detachInterrupt(digitalPinToInterrupt(25));                                   //turn off pulse interrupt used with radar input                              
@@ -3080,9 +2975,9 @@ void setup() {
   lv_init();                                            //start the littlevgl graphics engine
   pinMode(12, OUTPUT);                                  //diagnostic output
   pinMode(25, INPUT);                                   //Speed input pin
-  pinMode(status_light,OUTPUT);                         //on board status led
-  pinMode(alarm_light, OUTPUT);                          //diagnostic output
-  pinMode(aux_light, OUTPUT);                          //diagnostic output
+  pinMode(STATUS_LED,OUTPUT);                         //on board status led
+  pinMode(ALARM_LED, OUTPUT);                          //diagnostic output
+  pinMode(AUX_LED, OUTPUT);                          //diagnostic output
 //  while (Serial2.available() > 0) {
 //    Serial.print(char(Serial2.read()));                //send to serial monitor
 //  }
@@ -3248,7 +3143,7 @@ void loop() {                                                                   
 
    if (alarm_enable == 1){                                         //if alarm function is turned on
     if (velocity >= speed_target){                                 //turn alarm light on solid if over target speed
-         digitalWrite(alarm_light,1);                              //turn alarm light on solid
+         digitalWrite(ALARM_LED,1);                              //turn alarm light on solid
          timerAlarmDisable(flash_timer);                           //turn off flash timer interrupt
         }
     else{
@@ -3257,13 +3152,13 @@ void loop() {                                                                   
           flash_alarm();                                          //call routine to flash alarm quicker as it gets closer to target speed
           }
       else{
-        digitalWrite(alarm_light,0);                              //turn alarm light off
+        digitalWrite(ALARM_LED,0);                              //turn alarm light off
         timerAlarmDisable(flash_timer);                             //turn off flash timer interrupt
         }
      }
    }
    else{
-    digitalWrite(alarm_light,0);                                 //turn off alarm light if not in alarm mode
+    digitalWrite(ALARM_LED,0);                                 //turn off alarm light if not in alarm mode
     timerAlarmDisable(flash_timer);                             //turn off flash timer interrupt
    }
    
@@ -3280,7 +3175,7 @@ void loop() {                                                                   
       
       calc_flag = false;                                            //clear the flag
       status_mode = !status_mode;                                   //toggle value
-      digitalWrite(status_light,status_mode);                      //update on board led 
+      digitalWrite(STATUS_LED,status_mode);                      //update on board led 
       
       
       if(speed_input == 1){                                         //read serial if GPS is selected 0= radar 1 = gps
