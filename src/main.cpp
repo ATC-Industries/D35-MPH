@@ -67,15 +67,13 @@ constexpr int ALR2_EE_ADR = 50;         // Alarm 2 value
 constexpr int ALR3_EE_ADR = 55;         // Alarm 3 value
 constexpr int ALR4_EE_ADR = 60;         // Alarm 4 value
 
-/**********************
-    Graphics engine parameters
- **********************/
-Ticker tick;                                        /* timer for interrupt handler */
-TFT_eSPI tft = TFT_eSPI();                          /* TFT instance */
+// Graphics Engine Parameters
+Ticker tick;                             // Timer for interrupt handler
+TFT_eSPI tft = TFT_eSPI();               // TFT instance
 
-static lv_disp_buf_t disp_buf;                      //declare buffer for graphics
-static lv_color_t buf[LV_HOR_RES_MAX * 10];         //color depth of display
-static  int x = 90;
+static lv_disp_buf_t disp_buf;           // Declare buffer for graphics
+static lv_color_t buf[LV_HOR_RES_MAX * 10]; // Color depth of display
+static int xPos = 90;                    // X position of the cursor
 
 /**************************                         // This is the file name used to store the calibration data
    Touch Screen Calibration                         // You can change this to create new calibration files.
