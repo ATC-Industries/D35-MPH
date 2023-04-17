@@ -75,24 +75,19 @@ static lv_disp_buf_t disp_buf;           // Declare buffer for graphics
 static lv_color_t buf[LV_HOR_RES_MAX * 10]; // Color depth of display
 static int xPos = 90;                    // X position of the cursor
 
-/**************************                         // This is the file name used to store the calibration data
-   Touch Screen Calibration                         // You can change this to create new calibration files.
- **************************/                        // The SPIFFS file name must start with "/".
-TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);          //create instance of touch read program (last number is resistance across touch screen)
+// Touch Screen Calibration
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300); // Create instance of touch read program (last number is resistance across touch screen)
 
-#define CALIBRATION_FILE "/TouchCalData2"           //give name to file that holds touch screen cal values
-
-
-//#define REPEAT_CAL = true                           // Set REPEAT_CAL to true instead of false to run calibration
+constexpr char CALIBRATION_FILE[] = "/TouchCalData2"; // Name of the file that holds touch screen calibration values
 
 #if USE_LV_LOG != 0
-/* Serial debugging */
-void my_print(lv_log_level_t level, const char * file, uint32_t line, const char * dsc)
-  {
-  Serial.printf("%s@%d->%s\r\n", file, line, dsc);        //send file name and date loaded on unit to serial monitor
+// Serial debugging
+void my_print(lv_log_level_t level, const char *file, uint32_t line, const char *dsc) {
+  Serial.printf("%s@%d->%s\r\n", file, line, dsc); // Send file name and date loaded on unit to serial monitor
   delay(100);
-  }
+}
 #endif
+
 
 /**********************
     STATIC PROTOTYPES
