@@ -28,54 +28,83 @@ pulses inlimi300 ft times 17.6 = pulses in a mile
 
 This is a record of changes made to the software.
 
-### Version 10
+### v2.1.4 - 2021-10-27
+- Added dividing lines to option screen and moved around options to make screen more readable
+- Fixed issue where screen calibration would not run from factory service screen 2001
 
-- Added field calibration.
+### v2.1.3
+- Stable version
 
-### Version 11
+### v2.1.2
+- In field cal changed message box to say "Begin Driving", was "Begin Driving 300 ft" which was wrong when in metric mode
+- Changed 'Press STOP' to 'Press END' in field calibration screen
 
-- Added distance counter.
-- Added reset button for distance.
+### v2.1.1
+- Turned off mph label, alarm bell, and lines when 5 button keypad is shown
+- Made the preset 5 alarm buttons larger 
 
-### Version 22
+### v2.1.0
+- Stable version  
 
-- Added averaging routine to speed calculation.
-- Do not display decimal on speeds over 30.
-- Removed 'if' code from pulse interrupt routine that was causing pulses to reset to zero sometimes.
+### v2.0.9
+- Added text at bottom of screen to show alarm point setting
 
-### Version 23TP
+### v2.0.8
+- Repaired keypad problems in password screens, was pulling in wrong keypad
 
-- For tractor puller application.
-- Deleted the distance measuring mode.
-- Show .1 mph increments for all speeds under 50mph.
+### v2.0.7
+- Keep alarm check box on in option screen 
 
-### Version 24TP
+### v2.0.6
+- Added metric verbiage to field cal when in km mode 
 
-- Changed the algorithm that captures pulses from the speed device (old system was not accurate enough).
-- Went to positive edge on interrupt trigger to prevent false trips we were getting on negative edge trips of speed input line.
-- Changed to 250ms speed updates for quicker response time.
-- Made speed average an option on the option screen.
-- Added speed average checkbox to option screen.
+### v2.0.5
+- Added flashing light routine using hardware timers
 
-### Version 25TP
+### v2.0.3
+- Added OK button to minimum calibration message box tied to keyboard entry of cal number  
 
-- Changed 250ms interrupt clock to reset to zero on start of first pulse.
-- Added software version number in upper left corner of "Option Screen".
+### v2.0.2
+- Saved current alarm setting value (chosen on 5-key keypad) to EEPROM
+- Added second 2x5 keypad for security screen
+- Added message box on how to enter alarms on 5 button alarm setting screen
 
-### Version 1.26
+### v2.0.1
+- Version for Tractor pulling added 4 alarm points to the 1.27 version software
 
-- Fixed problem of instruction text staying on screen when leaving field calibration mode.
+### ver 1.27
+- Added checkboxes to option screen for radar or GPS input
+- Added code to read GPS on serial port "Serial2" //Serial2.begin(19200,SERIAL_8N1,25,22) 25-rx 22-tx
+- Moved radar input from pin 33 to pin 25 that is shared with RS232 input
 
-### Version 1.27
+### ver 1.26
+- Fixed problem of instruction text staying on screen when leaving field calibration mode
 
-- Added checkboxes to option screen for radar or gps input.
-- Added code to read GPS on serial port "Serial2" //Serial2.begin(19200,SERIAL_8N1,25,22) 25-rx 22-tx.
-- Moved radar input from pin 33 to pin 25 that is shared with rs232 input.
+### ver 25TP
+- Changed 250ms interrupt clock to reset to zero on start of first pulse
+- Added software version number in upper left corner of "Option Screen"
 
-### Version 1.28
+### ver 24TP
+- Changed algorithm that captures pulses from the speed device (old system was not accurate enough)
+- Went to positive edge on interrupt trigger to prevent false trips we were getting on negative edge trips of speed input line
+- Changed to 250ms speed updates for quicker response time
+- Made speed average an option on the option screen
+- Added speed average checkbox to option screen
 
-- Added pulsing alarm light that flashes faster as you near target.
-- Created a 100ms timer with interrupt routine to flash alarm light.
+### ver 23TP
+- For tractor puller application and deletes the distance measuring mode
+- Show .1 mph increments for all speeds under 50mph
+
+### ver 22
+- Added averaging routine to speed calculation
+- Do not display decimal on speeds over 30
+- Removed 'if' code from pulse interrupt routine that was causing pulses to reset to zero sometimes
+
+### ver 11
+- Added distance counter and reset button for distance
+
+### ver 10
+- Added field calibration
 
 ## GPS Sensor
 
